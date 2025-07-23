@@ -1,81 +1,55 @@
 "use client"
 
 import type React from "react"
-import { createContext, useState, useEffect, useContext, useCallback } from "react"
-import { useRouter } from "next/navigation"
+import { createContext, useState, useEffect } from "react"
 
-interface AuthContextType {
-  user: { username: string } | null
-  isLoading: boolean
-  login: (token: string) => void
-  logout: () => void
+interface User {
+  id: string
+  name: string
+  email: string
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined)
+interface AuthContextValue {
+  user: User | null
+  signIn: (user: User) => void
+  signOut: () => void
+  isAuthenticated: boolean
+}
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<{ username: string } | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
-  const checkAuth = useCallback(async () => {
-    try {
-      const response = await fetch("/api/admin/auth/session", {
-        credentials: "include", // Important: send cookies with the request
-      })
-      if (response.ok) {
-        const data = await response.json()
-        if (data.isAuthenticated) {
-          setUser(data.user)
-        } else {
-          setUser(null)
-        }
-      } else {
-        setUser(null)
-      }
-    } catch (error) {
-      console.error("Failed to check auth session:", error)
-      setUser(null)
-    } finally {
-      setIsLoading(false)
+interface AuthProviderProps {
+  children: React.ReactNode
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null)
+  const isAuthenticated = !!user
+
+  useEffect(() => {
+    // Check if user is already authenticated (e.g., from localStorage)
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
     }
   }, [])
 
-  useEffect(() => {
-    checkAuth()
-  }, [checkAuth])
-
-  const login = useCallback(
-    (token: string) => {
-      // In a real app, you'd store the actual token securely (e.g., httpOnly cookie set by server)
-      // For this mock, we just set a flag or a mock user
-      setUser({ username: "admin" })
-      // Optionally, trigger a re-check of auth to update state from server
-      checkAuth()
-    },
-    [checkAuth],
-  )
-
-  const logout = useCallback(async () => {
-    try {
-      await fetch("/api/admin/auth/logout", {
-        method: "POST",
-        credentials: "include", // Important: send cookies to clear session
-      })
-      setUser(null)
-      router.push("/admin/login")
-    } catch (error) {
-      console.error("Failed to logout:", error)
-    }
-  }, [router])
-
-  return <AuthContext.Provider value={{ user, isLoading, login, logout }}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+  const signIn = (user: User) => {
+    setUser(user)
+    localStorage.setItem("user", JSON.stringify(user))
   }
-  return context
+
+  const signOut = () => {
+    setUser(null)
+    localStorage.removeItem("user")
+  }
+
+  const value: AuthContextValue = {
+    user,
+    signIn,
+    signOut,
+    isAuthenticated,
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
