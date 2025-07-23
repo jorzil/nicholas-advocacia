@@ -161,9 +161,7 @@ export function Navbar() {
               </>
             ) : (
               <Link href="/admin/login">
-                <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
-                  Login Admin
-                </Button>
+                
               </Link>
             )}
             <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
