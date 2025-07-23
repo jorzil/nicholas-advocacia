@@ -42,7 +42,7 @@ export default function BlogManagementPage() {
         // Tenta ler a resposta como texto para depuração se não for JSON
         const errorText = await response.text()
         console.error("API Error Response:", errorText)
-        throw new Error(`HTTP error! status: ${response.status} - ${errorText.substring(0, 100)}...`)
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText.substring(0, 200)}...`) // Aumentado para 200 caracteres
       }
       const data = await response.json()
       setPosts(data)
