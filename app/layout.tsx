@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/contexts/auth-context"
 import ClientComponents from "./client-components"
-import Script from "next/script"
+import Script from "next/script" // Importar o componente Script
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     generator: 'v0.dev'
 }
 
-// New viewport export for Next.js 14.2.16 warnings
+// Nova exportação de viewport para Next.js 14.2.16
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -88,7 +88,7 @@ export default function RootLayout({
           }}
         />
 
-        {/* Google Analytics - Conditional */}
+        {/* Google Analytics - Condicional */}
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <Script

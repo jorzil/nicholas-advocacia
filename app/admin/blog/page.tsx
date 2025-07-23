@@ -36,16 +36,15 @@ export default function BlogManagementPage() {
     setLoading(true)
     setError(null)
     try {
-      // Usando NEXT_PUBLIC_APP_URL para garantir que a chamada funcione em produção
-      // Adicionado `credentials: 'include'` para garantir que os cookies de autenticação sejam enviados
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog`, {
+      const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog`
+      console.log("Fetching posts from:", apiUrl) // Log da URL da requisição
+      const response = await fetch(apiUrl, {
         credentials: "include",
       })
       if (!response.ok) {
-        // Tenta ler a resposta como texto para depuração se não for JSON
         const errorText = await response.text()
         console.error("API Error Response:", errorText)
-        throw new Error(`HTTP error! status: ${response.status} - ${errorText.substring(0, 200)}...`) // Aumentado para 200 caracteres
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText.substring(0, 200)}...`)
       }
       const data = await response.json()
       setPosts(data)
@@ -71,7 +70,7 @@ export default function BlogManagementPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog/${postToDelete}`, {
         method: "DELETE",
-        credentials: "include", // Adicionado para garantir que os cookies sejam enviados
+        credentials: "include",
       })
 
       if (!response.ok) {
@@ -83,7 +82,7 @@ export default function BlogManagementPage() {
         title: "Post excluído",
         description: "O post foi removido com sucesso.",
       })
-      fetchPosts() // Re-fetch posts after deletion
+      fetchPosts()
     } catch (e: any) {
       toast({
         title: "Erro ao excluir post",

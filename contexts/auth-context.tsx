@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 
 interface User {
   username: string
@@ -21,15 +22,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const { toast } = useToast()
 
-  /** Utilitário para ler cookie simples no client */
+  /* ------------------------- util: read simple cookie ------------------- */
   const readCookie = useCallback((name: string): string | undefined => {
     if (typeof document === "undefined") return
     const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"))
     return match ? decodeURIComponent(match[2]) : undefined
   }, [])
 
-  /** ------ Sessão inicial -------------------------------------------------- */
+  /* ------------------------- initial session check ---------------------- */
   useEffect(() => {
     const checkSession = async () => {
       const token = readCookie("auth_token")
@@ -46,7 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const data = await res.json()
           setUser({ username: data.user.username })
         } else {
-          // token inválido
           document.cookie = "auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;"
           setUser(null)
         }
@@ -60,33 +61,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkSession()
   }, [readCookie])
 
-  /** ------ LOGIN ----------------------------------------------------------- */
-  const login = useCallback(async (username: string, password: string) => {
-    setIsLoading(true)
-    try {
-      const res = await fetch("/api/admin/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      })
+  /* ------------------------------ login --------------------------------- */
+  const login = useCallback(
+    async (username: string, password: string) => {
+      setIsLoading(true)
+      try {
+        const res = await fetch("/api/admin/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        })
 
-      if (!res.ok) return false
+        if (!res.ok) return false
 
-      const data = await res.json()
-      // Cookie httpOnly é setado no próprio route handler,
-      // mas por garantia gravamos um cookie de fallback no client:
-      document.cookie = `auth_token=${data.token}; Path=/`
-      setUser({ username: data.user.username })
-      return true
-    } catch (err) {
-      console.error("Falha no login:", err)
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+        const data = await res.json()
+        document.cookie = `auth_token=${data.token}; Path=/`
+        setUser({ username: data.user.username })
+        return true
+      } catch (err) {
+        console.error("Falha no login:", err)
+        toast({
+          title: "Erro de login",
+          description: "Não foi possível realizar o login.",
+          variant: "destructive",
+        })
+        return false
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [toast],
+  )
 
-  /** ------ LOGOUT ---------------------------------------------------------- */
+  /* ----------------------------- logout --------------------------------- */
   const logout = useCallback(async () => {
     setIsLoading(true)
     try {
@@ -111,9 +118,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-/** Hook auxiliar */
+/* --------------------------- helper hook -------------------------------- */
 export function useAuth() {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error("useAuth deve ser utilizado dentro de um AuthProvider")
   return ctx
 }
+
+/* ------------------------------------------------------------------------ */
+/* guarantee named export presence                                          */

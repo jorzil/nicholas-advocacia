@@ -1,40 +1,55 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { useInView } from "react-intersection-observer"
+import { useEffect, useState } from "react"
 
 export function WhatsAppButton() {
   const [isVisible, setIsVisible] = useState(false)
+  const { ref, inView } = useInView({
+    triggerOnce: false, // Keep observing
+    threshold: 0.1, // Trigger when 10% of the element is visible
+  })
 
   useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.pageYOffset > 300) {
-        setIsVisible(true)
-      } else {
-        setIsVisible(false)
-      }
+    if (inView) {
+      setIsVisible(true)
+    } else {
+      setIsVisible(false)
     }
+  }, [inView])
 
-    window.addEventListener("scroll", toggleVisibility)
-
-    return () => window.removeEventListener("scroll", toggleVisibility)
-  }, [])
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5582999999999"
+  const whatsappMessage = encodeURIComponent(
+    "Olá, gostaria de mais informações sobre os serviços de advocacia imobiliária.",
+  )
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 transition-opacity duration-300 ${
-        isVisible ? "opacity-100" : "opacity-0"
-      }`}
+      ref={ref}
+      className={cn(
+        "fixed bottom-6 right-6 z-50 transition-all duration-500",
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+      )}
     >
-      <Link
-        href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block w-16 h-16 rounded-full shadow-lg hover:scale-110 transition-transform duration-200"
-        aria-label="Fale conosco pelo WhatsApp"
-      >
-        <Image src="/whatsapp-icon-new.png" alt="WhatsApp" width={64} height={64} className="rounded-full" />
+      <Link href={whatsappLink} target="_blank" rel="noopener noreferrer">
+        <Button
+          className="relative h-16 w-16 rounded-full shadow-lg flex items-center justify-center p-0 overflow-hidden"
+          aria-label="Fale conosco pelo WhatsApp"
+        >
+          <Image
+            src="/whatsapp-icon-new.png"
+            alt="WhatsApp Icon"
+            width={40}
+            height={40}
+            className="transition-transform duration-300 group-hover:scale-110"
+          />
+          <span className="sr-only">WhatsApp</span>
+        </Button>
       </Link>
     </div>
   )

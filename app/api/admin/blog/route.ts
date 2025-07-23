@@ -260,6 +260,7 @@ const blogPosts = [
 ]
 
 export async function GET() {
+  console.log("API /api/admin/blog GET handler hit.") // Log para verificar se a rota é acessada
   return NextResponse.json(blogPosts)
 }
 

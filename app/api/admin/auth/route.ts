@@ -4,21 +4,17 @@ import { cookies } from "next/headers"
 export async function POST(request: Request) {
   const { username, password } = await request.json()
 
-  // Hardcoded credentials for demonstration purposes
-  // In a real application, you would validate against a database
+  // Lógica de autenticação simples (substitua por sua lógica real)
   if (username === "admin" && password === "nicholas2024") {
-    // Simulate a token generation
-    const token = "valid-admin-token" // This should be a JWT in a real app
-
-    // Set a secure, httpOnly cookie
-    cookies().set("auth_token", token, {
+    const cookieStore = cookies()
+    // Define um cookie de autenticação
+    cookieStore.set("auth_token", "valid-admin-token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // 1 week
+      maxAge: 60 * 60 * 24, // 1 dia
       path: "/",
     })
-
-    return NextResponse.json({ message: "Login successful", user: { username: "admin" }, token })
+    return NextResponse.json({ isAuthenticated: true, user: { username: "admin" } })
   } else {
     return NextResponse.json({ message: "Invalid credentials" }, { status: 401 })
   }

@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const token = cookieStore.get("auth_token")?.value
 
   if (token === "valid-admin-token") {
-    // In a real app, you would decode and verify the token
+    // Em uma aplicação real, você decodificaria e verificaria o token
     return NextResponse.json({ isAuthenticated: true, user: { username: "admin" } })
   } else {
     return NextResponse.json({ isAuthenticated: false }, { status: 401 })
