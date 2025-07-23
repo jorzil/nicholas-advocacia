@@ -1,15 +1,15 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { MessageCircleMore } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import Link from "next/link"
 
 export function WhatsAppButton() {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.scrollY > 300) {
+      if (window.pageYOffset > 300) {
         setIsVisible(true)
       } else {
         setIsVisible(false)
@@ -21,21 +21,21 @@ export function WhatsAppButton() {
     return () => window.removeEventListener("scroll", toggleVisibility)
   }, [])
 
-  const handleWhatsAppClick = () => {
-    const phoneNumber = "5511999999999" // Replace with your WhatsApp number
-    const message = encodeURIComponent("Olá, gostaria de mais informações sobre os seus serviços.")
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank")
-  }
-
   return (
-    <Button
-      className={`fixed bottom-6 right-6 rounded-full p-4 shadow-lg transition-opacity duration-300 ${
-        isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+    <div
+      className={`fixed bottom-6 right-6 z-50 transition-opacity duration-300 ${
+        isVisible ? "opacity-100" : "opacity-0"
       }`}
-      onClick={handleWhatsAppClick}
-      aria-label="Fale conosco pelo WhatsApp"
     >
-      <MessageCircleMore className="h-6 w-6 text-white" />
-    </Button>
+      <Link
+        href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block w-16 h-16 rounded-full shadow-lg hover:scale-110 transition-transform duration-200"
+        aria-label="Fale conosco pelo WhatsApp"
+      >
+        <Image src="/whatsapp-icon-new.png" alt="WhatsApp" width={64} height={64} className="rounded-full" />
+      </Link>
+    </div>
   )
 }

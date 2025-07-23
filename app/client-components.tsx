@@ -69,7 +69,7 @@ export default function ClientComponents({ children }: ClientComponentsProps) {
   return (
     <>
       <Navbar />
-      <main>{children}</main>
+      <main role="main">{children}</main>
       <Footer />
       <WhatsAppButton />
     </>
