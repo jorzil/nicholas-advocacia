@@ -3,129 +3,70 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { AuthProvider } from "@/contexts/auth-context" // Import AuthProvider
-import Script from "next/script"
-import { Toaster } from "@/components/ui/toaster" // Ensure Toaster is imported
-import { ClientComponents } from "./client-components" // Import ClientComponents
+import { Toaster } from "@/components/ui/toaster"
+import { AuthProvider } from "@/contexts/auth-context"
+import ClientComponents from "./client-components"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Nicholas Advocacia - Especialistas em Direito Imobiliário",
-  description:
-    "Escritório de advocacia especializado em direito imobiliário, usucapião, regularização de imóveis e contratos. Atendimento personalizado e resultados garantidos.",
-  keywords:
-    "advogado, direito imobiliário, usucapião, regularização de imóveis, contratos imobiliários, Nicholas Advocacia, Arapiraca, Alagoas",
-  authors: [{ name: "Nicholas Advocacia" }],
-  creator: "Nicholas Advocacia",
-  publisher: "Nicholas Advocacia",
-  robots: "index, follow",
-  openGraph: {
-    type: "website",
-    locale: "pt_BR",
-    url: "https://www.nicholasadvocacia.com.br",
-    title: "Nicholas Advocacia - Especialistas em Direito Imobiliário",
-    description:
-      "Escritório de advocacia especializado em direito imobiliário, usucapião, regularização de imóveis e contratos.",
-    siteName: "Nicholas Advocacia",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Nicholas Advocacia - Especialistas em Direito Imobiliário",
-    description:
-      "Escritório de advocacia especializado em direito imobiliário, usucapião, regularização de imóveis e contratos.",
-  },
+  title: "Nicholas Advocacia",
+  description: "Nicholas Advocacia - Especialistas em Direito Imobiliário",
     generator: 'v0.dev'
-}
-
-// New viewport export for Next.js 14.2.16 warnings
-export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#1e2c49",
 }
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         {/* Google Tag Manager */}
-        <Script
-          id="gtm-script"
-          strategy="afterInteractive"
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
               new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
               j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id=GTM-PZ96Q3PZ';
-              if(f && f.parentNode) {
-                f.parentNode.insertBefore(j,f);
-              } else {
-                (d.head || d.getElementsByTagName('head')[0]).appendChild(j);
-              }
-              })(window,document,'script','dataLayer','GTM-PZ96Q3PZ');
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-XXXXXXX');
             `,
           }}
         />
-
-        {/* Google Ads Conversion Tracking */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=AW-16734697271" strategy="afterInteractive" />
-        <Script
-          id="google-ads"
-          strategy="afterInteractive"
+        {/* End Google Tag Manager */}
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script>
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'AW-16734697271');
+              gtag('config', 'G-XXXXXXXXX');
             `,
           }}
         />
-
-        {/* Google Analytics - Conditional */}
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script
-              id="google-analytics"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
-                `,
-              }}
-            />
-          </>
-        )}
+        {/* End Google Analytics */}
       </head>
       <body className={inter.className}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-PZ96Q3PZ"
+            src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
             height="0"
             width="0"
             style={{ display: "none", visibility: "hidden" }}
-          />
+          ></iframe>
         </noscript>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        {/* End Google Tag Manager (noscript) */}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <ClientComponents>{children}</ClientComponents>
           </AuthProvider>
+          <Toaster />
         </ThemeProvider>
-        <Toaster />
       </body>
     </html>
   )

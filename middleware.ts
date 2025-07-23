@@ -5,22 +5,27 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value
   const { pathname } = request.nextUrl
 
-  // Log para depuração: verifica se o token está presente e qual o pathname
+  // Log para depuração
   console.log(`Middleware: Pathname: ${pathname}, Token present: ${!!token}`)
   if (token) {
     console.log(`Middleware: Token value (first 5 chars): ${token.substring(0, 5)}...`)
   }
 
-  // Allow access to the login page without authentication
+  // Permite acesso à página de login sem autenticação
   if (pathname === "/admin/login") {
     return NextResponse.next()
   }
 
-  // Protect all other admin routes
+  // Protege todas as outras rotas /admin
   if (pathname.startsWith("/admin")) {
     if (!token || token !== "valid-admin-token") {
-      console.log(`Middleware: Redirecting to login for ${pathname} due to missing/invalid token.`)
-      // Redirect to login page if not authenticated
+      console.log(`Middleware: Unauthorized access to ${pathname}.`)
+
+      // Se for uma requisição de API, retorna 401 JSON
+      if (pathname.startsWith("/api/admin")) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      }
+      // Se for uma página, redireciona para a página de login
       const loginUrl = new URL("/admin/login", request.url)
       return NextResponse.redirect(loginUrl)
     }
@@ -30,5 +35,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"], // Apply middleware to all /admin routes
+  matcher: ["/admin/:path*"], // Aplica o middleware a todas as rotas /admin
 }
