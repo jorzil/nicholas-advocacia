@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { MapPin, Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react"
+import { MapPin, Phone, Mail, YoutubeIcon,Facebook, Instagram, Linkedin } from "lucide-react"
 
 export function Footer() {
   return (
@@ -130,8 +130,8 @@ export function Footer() {
               </a>
             </li>
             <li className="flex items-start justify-center md:justify-start gap-2">
-              <MapPin className="h-5 w-5 text-[#d4b26a] mt-1" />
-              <span className="text-gray-300">Rua Dr. João Pinheiro, 123 - Centro, Arapiraca - AL, 57300-000</span>
+              
+              
             </li>
           </ul>
           <div className="flex justify-center md:justify-start space-x-4 mt-6">
@@ -141,7 +141,7 @@ export function Footer() {
               rel="noopener noreferrer"
               aria-label="Facebook"
             >
-              <Facebook className="h-6 w-6 text-gray-300 hover:text-[#d4b26a] transition-colors" />
+              <YoutubeIcon className="h-6 w-6 text-gray-300 hover:text-[#d4b26a] transition-colors" />
             </a>
             <a
               href="https://www.instagram.com/nicholasadvocacia"
