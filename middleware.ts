@@ -35,5 +35,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"], // Aplica o middleware a todas as rotas /admin
+  matcher: ["/admin/:path*", "/api/admin/:path*"], // Aplica o middleware a todas as rotas /admin e /api/admin
 }

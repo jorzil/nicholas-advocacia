@@ -68,23 +68,25 @@ export async function GET() {
     }
 
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${GOOGLE_PLACE_ID}&fields=reviews,rating,user_ratings_total,name&key=${GOOGLE_PLACES_API_KEY}&language=pt-BR`
+    console.log("Attempting to fetch Google Places API from URL:", url) // Log the full URL
 
     const response = await fetch(url, {
       next: { revalidate: 3600 }, // Cache for 1 hour to reduce API calls
     })
 
     if (!response.ok) {
-      console.error(`Google Places API HTTP error: ${response.status} ${response.statusText}`)
-      // Do not throw, return fallback data
+      const errorText = await response.text()
+      console.error(
+        `Google Places API HTTP error: ${response.status} ${response.statusText}. Response body: ${errorText}`,
+      )
       return NextResponse.json({ ...defaultResponse, error: `HTTP error: ${response.status}` })
     }
 
     const data = await response.json()
 
-    // Log the status for debugging
+    console.log("Google Places API raw response data:", JSON.stringify(data, null, 2)) // Log raw data for debugging
     console.log("Google Places API status:", data.status)
 
-    // Handle different API statuses gracefully
     if (data.status === "OK" && data.result) {
       const reviews = data.result.reviews || []
       return NextResponse.json({
@@ -96,7 +98,6 @@ export async function GET() {
         source: reviews.length > 0 ? "google" : "fallback",
       })
     } else {
-      // For any non-OK status (NOT_FOUND, INVALID_REQUEST, etc.), return fallback
       console.warn(`[google-reviews] Places API responded with ${data.status}. Serving fallback testimonials.`)
       return NextResponse.json({
         ...defaultResponse,
@@ -104,7 +105,6 @@ export async function GET() {
       })
     }
   } catch (error) {
-    // On any unexpected error during fetch or parsing, return fallback data
     console.error("Error with Google Places API, using fallback reviews:", error)
     return NextResponse.json({
       ...defaultResponse,

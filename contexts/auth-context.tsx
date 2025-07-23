@@ -1,51 +1,59 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import type React from "react"
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
+import Cookies from "js-cookie"
 
-interface AuthState {
-  user: { id: string; name: string } | null
-  token: string | null
+interface User {
+  username: string
 }
 
-interface AuthContextValue extends AuthState {
-  login: (token: string, user: { id: string; name: string }) => void
+interface AuthContextType {
+  user: User | null
+  isLoading: boolean
+  login: (username: string, token: string) => void
   logout: () => void
 }
 
-export const AuthContext = createContext<AuthContextValue | null>(null)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    token: null,
-  })
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-    // Carrega estado salvo no localStorage (client only)
-    const savedToken = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
-    const savedUser = typeof window !== "undefined" ? localStorage.getItem("auth_user") : null
-    if (savedToken && savedUser) {
-      setState({ token: savedToken, user: JSON.parse(savedUser) })
+    const token = Cookies.get("auth_token")
+    if (token === "valid-admin-token") {
+      // In a real app, you'd fetch user details from an API using the token
+      setUser({ username: "admin" })
     }
+    setIsLoading(false)
   }, [])
 
-  const login = (token: string, user: { id: string; name: string }) => {
-    localStorage.setItem("auth_token", token)
-    localStorage.setItem("auth_user", JSON.stringify(user))
-    setState({ token, user })
-  }
+  const login = useCallback(
+    (username: string, token: string) => {
+      Cookies.set("auth_token", token, { expires: 7, secure: process.env.NODE_ENV === "production" }) // Expires in 7 days
+      setUser({ username })
+      router.push("/admin/blog")
+    },
+    [router],
+  )
 
-  const logout = () => {
-    localStorage.removeItem("auth_token")
-    localStorage.removeItem("auth_user")
-    setState({ token: null, user: null })
-  }
+  const logout = useCallback(() => {
+    Cookies.remove("auth_token")
+    setUser(null)
+    router.push("/admin/login")
+  }, [router])
 
-  return <AuthContext.Provider value={{ ...state, login, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, isLoading, login, logout }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error("useAuth must be used within <AuthProvider>")
-  return ctx
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthContextProvider")
+  }
+  return context
 }

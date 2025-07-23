@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/contexts/auth-context" // Import useAuth
 
 interface BlogPost {
   id: string
@@ -31,19 +32,25 @@ export default function BlogManagementPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [postToDelete, setPostToDelete] = useState<string | null>(null)
   const { toast } = useToast()
+  const { user, isLoading: authLoading } = useAuth() // Get user and authLoading from context
 
   const fetchPosts = async () => {
     setLoading(true)
     setError(null)
     try {
       const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog`
-      console.log("Fetching posts from:", apiUrl) // Log da URL da requisição
+      console.log("Fetching posts from:", apiUrl)
       const response = await fetch(apiUrl, {
-        credentials: "include",
+        credentials: "include", // Ensure cookies are sent
       })
+
       if (!response.ok) {
         const errorText = await response.text()
         console.error("API Error Response:", errorText)
+        // Check for 401 specifically
+        if (response.status === 401) {
+          throw new Error("Não autorizado. Por favor, faça login novamente.")
+        }
         throw new Error(`HTTP error! status: ${response.status} - ${errorText.substring(0, 200)}...`)
       }
       const data = await response.json()
@@ -61,8 +68,15 @@ export default function BlogManagementPage() {
   }
 
   useEffect(() => {
-    fetchPosts()
-  }, [])
+    // Only fetch posts if authentication is not loading and user is logged in
+    if (!authLoading && user) {
+      fetchPosts()
+    } else if (!authLoading && !user) {
+      // If auth is done loading and no user, set error to prompt login
+      setLoading(false)
+      setError("Você precisa estar logado para acessar esta página.")
+    }
+  }, [user, authLoading]) // Depend on user and authLoading state
 
   const handleDelete = async () => {
     if (!postToDelete) return
@@ -107,7 +121,7 @@ export default function BlogManagementPage() {
       post.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent" />
@@ -121,9 +135,16 @@ export default function BlogManagementPage() {
         <XCircle className="h-12 w-12 mb-4" />
         <p className="text-xl font-semibold">Erro ao carregar posts:</p>
         <p className="text-center">{error}</p>
-        <Button onClick={fetchPosts} className="mt-4">
-          Tentar Novamente
-        </Button>
+        {!user && (
+          <Link href="/admin/login">
+            <Button className="mt-4">Ir para Login</Button>
+          </Link>
+        )}
+        {user && ( // Only show retry if user is logged in
+          <Button onClick={fetchPosts} className="mt-4">
+            Tentar Novamente
+          </Button>
+        )}
       </div>
     )
   }

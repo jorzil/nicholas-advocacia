@@ -3,58 +3,79 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { useAuth } from "@/hooks/use-auth" // Import useAuth
+import { useAuth } from "@/contexts/auth-context" // Import useAuth
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  const { login } = useAuth() // Get the login function from AuthContext
+  const { login } = useAuth() // Use the login function from AuthContext
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setLoading(true)
 
-    const success = await login(username, password) // Use the login function from context
-
-    if (success) {
-      toast({
-        title: "Login bem-sucedido",
-        description: "Redirecionando para o painel de administração...",
+    try {
+      const response = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
       })
-      router.push("/admin/blog") // Redirect to the admin dashboard
-    } else {
-      // Error toast is handled by the login function in auth-context
+
+      const data = await response.json()
+
+      if (response.ok) {
+        login(username, data.token) // Use the login function from AuthContext
+        toast({
+          title: "Login bem-sucedido",
+          description: "Você foi logado com sucesso!",
+        })
+      } else {
+        toast({
+          title: "Erro de Login",
+          description: data.message || "Credenciais inválidas. Tente novamente.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Erro ao tentar fazer login:", error)
+      toast({
+        title: "Erro de Rede",
+        description: "Não foi possível conectar ao servidor. Verifique sua conexão.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
     }
-    setIsLoading(false)
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Login do Administrador</CardTitle>
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold">Login Administrativo</CardTitle>
           <CardDescription>Acesse o painel de gerenciamento do blog.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Usuário</Label>
               <Input
                 id="username"
                 type="text"
-                placeholder="Digite seu usuário"
+                placeholder="admin"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -62,20 +83,18 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Digite sua senha"
+                placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Entrando..." : "Entrar"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="text-center text-sm text-gray-500">
-          <p>Apenas usuários autorizados podem acessar esta área.</p>
-        </CardFooter>
       </Card>
     </div>
   )

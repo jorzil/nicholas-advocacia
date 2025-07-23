@@ -6,7 +6,7 @@ import Image from "next/image"
 import { Phone, LogInIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/contexts/auth-context" // Import useAuth
+import { useAuth } from "@/contexts/auth-context"
 import { SheetTrigger, SheetContent, Sheet } from "@/components/ui/sheet"
 import { MenuIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -16,32 +16,31 @@ export function Navbar() {
   const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
-  const { user, isLoading, logout } = useAuth() // Safely destructure user, isLoading, and logout
+  const { user, isLoading, logout } = useAuth()
 
   const navLinks = [
-    { href: "/", label: "Início" },
-    { href: "/sobre", label: "Sobre" },
-    { href: "/servicos", label: "Serviços" },
-    { href: "/blog", label: "Blog" },
-    { href: "/contato", label: "Contato" },
+    { href: "/", label: "Início", sectionId: "hero-section" }, // Added sectionId for homepage scrolling
+    { href: "/sobre", label: "Sobre", sectionId: "sobre-escritorio" },
+    { href: "/servicos", label: "Serviços", sectionId: "servicos" },
+    { href: "/blog", label: "Blog", sectionId: "blog-section" },
+    { href: "/contato", label: "Contato", sectionId: "contato-section" },
   ]
 
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
-      if (isOpen && !target.closest("nav")) {
+      if (isOpen && !target.closest("nav") && !target.closest("[data-radix-popper-content-wrapper]")) {
         setIsOpen(false)
       }
     }
 
     if (isOpen) {
       document.addEventListener("click", handleClickOutside)
-      document.body.style.overflow = "hidden" // Prevent scrolling when mobile menu is open
+      document.body.style.overflow = "hidden"
     } else {
       document.body.style.overflow = "unset"
     }
@@ -52,7 +51,6 @@ export function Navbar() {
     }
   }, [isOpen])
 
-  // Close mobile menu on escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isOpen) {
@@ -64,22 +62,19 @@ export function Navbar() {
     return () => document.removeEventListener("keydown", handleEscape)
   }, [isOpen])
 
-  const handleNavClick = (sectionId: string) => {
-    setIsOpen(false) // Close mobile menu on click
+  const handleNavClick = (sectionId: string, href: string) => {
+    setIsOpen(false)
     if (isHomePage) {
-      // If on home page, scroll to section
       const element = document.getElementById(sectionId)
       if (element) {
         element.scrollIntoView({ behavior: "smooth" })
       }
     } else {
-      // If not on home page, navigate to home with hash
-      window.location.href = `/#${sectionId}`
+      window.location.href = `${href}#${sectionId}`
     }
   }
 
   if (!isMounted) {
-    // Render a basic placeholder or nothing until mounted to prevent hydration mismatch
     return (
       <header
         className="fixed top-0 left-0 right-0 z-50 w-full bg-white shadow-sm dark:bg-gray-950"
@@ -129,22 +124,28 @@ export function Navbar() {
           {navLinks.map((link) => (
             <Link
               key={link.href}
-              className={cn(
-                "font-medium transition-colors hover:text-primary-foreground",
-                pathname === link.href ? "text-primary-foreground" : "text-gray-500 dark:text-gray-400",
-              )}
               href={link.href}
+              onClick={(e) => {
+                if (link.sectionId && isHomePage) {
+                  e.preventDefault()
+                  handleNavClick(link.sectionId, link.href)
+                }
+              }}
+              className={cn(
+                "font-medium transition-colors hover:text-[#d4b26a]",
+                pathname === link.href ? "text-[#d4b26a]" : "text-gray-500 dark:text-gray-400",
+              )}
             >
               {link.label}
             </Link>
           ))}
           {isLoading ? null : user ? (
             <>
-              <span className="text-gray-700">Olá, {user.username}!</span>
+              <span className="text-gray-700 dark:text-gray-300">Olá, {user.username}!</span>
               <Button
                 onClick={logout}
                 variant="outline"
-                className="text-gray-700 border-gray-700 hover:bg-[#d4b26a] hover:text-white bg-transparent"
+                className="text-gray-700 border-gray-700 hover:bg-[#d4b26a] hover:text-white bg-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-[#d4b26a]"
               >
                 Sair
               </Button>
@@ -156,14 +157,21 @@ export function Navbar() {
             </>
           ) : (
             <Link href="/admin/login">
-              
+              <Button
+                variant="ghost"
+                className="h-auto p-0 font-medium text-gray-500 hover:text-[#d4b26a] dark:text-gray-400 dark:hover:text-[#d4b26a]"
+              >
+                <LogInIcon className="mr-2 h-4 w-4" /> Login Admin
+              </Button>
             </Link>
           )}
           <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
             <Link
-              href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!"
+              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!`}
               className="flex items-center gap-2"
               aria-label="Falar com especialista no WhatsApp"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <Phone className="h-4 w-4" aria-hidden="true" />
               Falar com Especialista
@@ -184,26 +192,32 @@ export function Navbar() {
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
-                  className={cn(
-                    "font-medium transition-colors hover:text-primary-foreground",
-                    pathname === link.href ? "text-primary-foreground" : "text-gray-500 dark:text-gray-400",
-                  )}
                   href={link.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => {
+                    if (link.sectionId && isHomePage) {
+                      e.preventDefault()
+                      handleNavClick(link.sectionId, link.href)
+                    }
+                    setIsOpen(false)
+                  }}
+                  className={cn(
+                    "font-medium transition-colors hover:text-[#d4b26a]",
+                    pathname === link.href ? "text-[#d4b26a]" : "text-gray-500 dark:text-gray-400",
+                  )}
                 >
                   {link.label}
                 </Link>
               ))}
               {isLoading ? null : user ? (
                 <>
-                  <span className="text-sm text-gray-700 block mb-2">Olá, {user.username}!</span>
+                  <span className="text-sm text-gray-700 block mb-2 dark:text-gray-300">Olá, {user.username}!</span>
                   <Button
                     onClick={() => {
                       logout()
                       setIsOpen(false)
                     }}
                     variant="outline"
-                    className="w-full text-gray-700 border-gray-700 hover:bg-[#d4b26a] hover:text-white bg-transparent mb-2"
+                    className="w-full text-gray-700 border-gray-700 hover:bg-[#d4b26a] hover:text-white bg-transparent mb-2 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-[#d4b26a]"
                   >
                     Sair
                   </Button>
@@ -228,10 +242,12 @@ export function Navbar() {
               )}
               <Button className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
                 <Link
-                  href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!"
+                  href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!`}
                   className="flex items-center gap-2"
                   onClick={() => setIsOpen(false)}
                   aria-label="Falar com especialista no WhatsApp"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <Phone className="h-4 w-4" aria-hidden="true" />
                   Falar com Especialista
