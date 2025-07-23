@@ -28,10 +28,10 @@ const formSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "O slug deve conter apenas letras minúsculas, números e hífens."),
   content: z.string().min(50, "O conteúdo deve ter pelo menos 50 caracteres."),
   author: z.string().min(3, "O autor deve ter pelo menos 3 caracteres."),
-  publishedAt: z.date({ required_error: "A data de publicação é obrigatória." }),
+  published_at: z.date({ required_error: "A data de publicação é obrigatória." }), // Changed to published_at
   status: z.enum(["published", "draft"]),
   tags: z.array(z.string()).min(1, "Selecione pelo menos uma tag."),
-  featuredImage: z.string().optional(),
+  featured_image: z.string().optional(), // Changed to featured_image
 })
 
 type BlogPostFormValues = z.infer<typeof formSchema>
@@ -53,10 +53,10 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
       slug: "",
       content: "",
       author: "Nicholas Nascimento", // Default author
-      publishedAt: new Date(),
+      published_at: new Date(), // Changed to published_at
       status: "draft",
       tags: [],
-      featuredImage: "",
+      featured_image: "", // Changed to featured_image
     },
   })
 
@@ -69,14 +69,15 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
   } = form
   const watchedTags = watch("tags")
   const watchedContent = watch("content")
-  const watchedFeaturedImage = watch("featuredImage")
+  const watchedFeaturedImage = watch("featured_image") // Changed to featured_image
 
   useEffect(() => {
     if (initialData?.content) {
       setValue("content", initialData.content, { shouldValidate: true })
     }
-    if (initialData?.featuredImage) {
-      setValue("featuredImage", initialData.featuredImage, { shouldValidate: true })
+    if (initialData?.featured_image) {
+      // Changed to featured_image
+      setValue("featured_image", initialData.featured_image, { shouldValidate: true }) // Changed to featured_image
     }
   }, [initialData, setValue])
 
@@ -151,30 +152,32 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
             {errors.author && <p className="text-red-500 text-sm mt-1">{errors.author.message}</p>}
           </div>
           <div>
-            <Label htmlFor="publishedAt">Data de Publicação</Label>
+            <Label htmlFor="published_at">Data de Publicação</Label> {/* Changed to published_at */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !watch("publishedAt") && "text-muted-foreground",
+                    !watch("published_at") && "text-muted-foreground", // Changed to published_at
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watch("publishedAt") ? format(watch("publishedAt"), "PPP") : <span>Escolha uma data</span>}
+                  {watch("published_at") ? format(watch("published_at"), "PPP") : <span>Escolha uma data</span>}{" "}
+                  {/* Changed to published_at */}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <Calendar
                   mode="single"
-                  selected={watch("publishedAt")}
-                  onSelect={(date) => setValue("publishedAt", date!)}
+                  selected={watch("published_at")} // Changed to published_at
+                  onSelect={(date) => setValue("published_at", date!)} // Changed to published_at
                   initialFocus
                 />
               </PopoverContent>
             </Popover>
-            {errors.publishedAt && <p className="text-red-500 text-sm mt-1">{errors.publishedAt.message}</p>}
+            {errors.published_at && <p className="text-red-500 text-sm mt-1">{errors.published_at.message}</p>}{" "}
+            {/* Changed to published_at */}
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -218,9 +221,11 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
         </div>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="featuredImage">Imagem Destacada</Label>
-            <ImageUpload value={watchedFeaturedImage} onChange={(url) => setValue("featuredImage", url)} />
-            {errors.featuredImage && <p className="text-red-500 text-sm mt-1">{errors.featuredImage.message}</p>}
+            <Label htmlFor="featured_image">Imagem Destacada</Label> {/* Changed to featured_image */}
+            <ImageUpload value={watchedFeaturedImage} onChange={(url) => setValue("featured_image", url)} />{" "}
+            {/* Changed to featured_image */}
+            {errors.featured_image && <p className="text-red-500 text-sm mt-1">{errors.featured_image.message}</p>}{" "}
+            {/* Changed to featured_image */}
           </div>
         </div>
       </div>

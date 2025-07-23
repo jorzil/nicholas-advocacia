@@ -1,33 +1,30 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value
   const { pathname } = request.nextUrl
 
-  // Log para depuração
   console.log(`Middleware: Pathname: ${pathname}, Token present: ${!!token}`)
-  if (token) {
-    console.log(`Middleware: Token value (first 5 chars): ${token.substring(0, 5)}...`)
-  }
 
-  // Permite acesso à página de login sem autenticação
-  if (pathname === "/admin/login") {
-    return NextResponse.next()
-  }
-
-  // Protege todas as outras rotas /admin
+  // Protect admin routes
   if (pathname.startsWith("/admin")) {
-    if (!token || token !== "valid-admin-token") {
-      console.log(`Middleware: Unauthorized access to ${pathname}.`)
+    if (!token) {
+      console.log("Middleware: No token found for admin route, redirecting to login.")
+      // Redirect to login page if no token
+      return NextResponse.redirect(new URL("/admin/login", request.url))
+    }
+  }
 
-      // Se for uma requisição de API, retorna 401 JSON
-      if (pathname.startsWith("/api/admin")) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-      }
-      // Se for uma página, redireciona para a página de login
-      const loginUrl = new URL("/admin/login", request.url)
-      return NextResponse.redirect(loginUrl)
+  // Protect admin API routes
+  if (pathname.startsWith("/api/admin")) {
+    if (!token) {
+      console.log("Middleware: No token found for admin API route, returning 401.")
+      // Return 401 for API routes if no token
+      return new NextResponse(JSON.stringify({ message: "Authentication required" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      })
     }
   }
 
@@ -35,5 +32,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"], // Aplica o middleware a todas as rotas /admin e /api/admin
+  matcher: [
+    "/admin/:path*", // Protect all /admin routes
+    "/api/admin/:path*", // Protect all /api/admin routes
+  ],
 }

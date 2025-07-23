@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Cookies from "js-cookie"
@@ -25,8 +26,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const token = Cookies.get("auth_token")
-    if (token === "valid-admin-token") {
-      // In a real app, you'd fetch user details from an API using the token
+    if (token) {
+      // In a real app, you'd validate the token with your backend
+      // For this mock, we just assume it's valid and set a dummy user
       setUser({ username: "admin" })
     }
     setIsLoading(false)
@@ -34,9 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     (username: string, token: string) => {
-      Cookies.set("auth_token", token, { expires: 7, secure: process.env.NODE_ENV === "production" }) // Expires in 7 days
+      Cookies.set("auth_token", token, { expires: 7, secure: process.env.NODE_ENV === "production" }) // 7 days expiration
       setUser({ username })
-      router.push("/admin/blog")
+      router.push("/admin/blog") // Redirect to admin blog page after login
     },
     [router],
   )
@@ -44,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     Cookies.remove("auth_token")
     setUser(null)
-    router.push("/admin/login")
+    router.push("/admin/login") // Redirect to login page after logout
   }, [router])
 
   return <AuthContext.Provider value={{ user, isLoading, login, logout }}>{children}</AuthContext.Provider>
@@ -53,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthContextProvider")
+    throw new Error("useAuth must be used within an AuthProvider")
   }
   return context
 }

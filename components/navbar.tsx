@@ -1,258 +1,192 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Phone, LogInIcon } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { Menu, Phone, Mail, MapPin, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/contexts/auth-context"
-import { SheetTrigger, SheetContent, Sheet } from "@/components/ui/sheet"
-import { MenuIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useAuth } from "@/contexts/auth-context" // Import useAuth
+import { usePathname } from "next/navigation"
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [activeSection, setActiveSection] = useState("")
+  const { user, isLoading, logout } = useAuth() // Get user, isLoading, logout from AuthContext
   const pathname = usePathname()
-  const isHomePage = pathname === "/"
-  const { user, isLoading, logout } = useAuth()
-
-  const navLinks = [
-    { href: "/", label: "Início", sectionId: "hero-section" }, // Added sectionId for homepage scrolling
-    { href: "/sobre", label: "Sobre", sectionId: "sobre-escritorio" },
-    { href: "/servicos", label: "Serviços", sectionId: "servicos" },
-    { href: "/blog", label: "Blog", sectionId: "blog-section" },
-    { href: "/contato", label: "Contato", sectionId: "contato-section" },
-  ]
 
   useEffect(() => {
-    setIsMounted(true)
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true)
+      } else {
+        setIsScrolled(false)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element
-      if (isOpen && !target.closest("nav") && !target.closest("[data-radix-popper-content-wrapper]")) {
-        setIsOpen(false)
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener("click", handleClickOutside)
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "unset"
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside)
-      document.body.style.overflow = "unset"
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isOpen) {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener("keydown", handleEscape)
-    return () => document.removeEventListener("keydown", handleEscape)
-  }, [isOpen])
-
-  const handleNavClick = (sectionId: string, href: string) => {
-    setIsOpen(false)
-    if (isHomePage) {
-      const element = document.getElementById(sectionId)
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith("/#")) {
+      e.preventDefault()
+      const id = href.substring(2)
+      const element = document.getElementById(id)
       if (element) {
         element.scrollIntoView({ behavior: "smooth" })
+        setActiveSection(id)
       }
     } else {
-      window.location.href = `${href}#${sectionId}`
+      // For regular links, let Next.js handle navigation
+      setActiveSection("") // Clear active section for external pages
     }
   }
 
-  if (!isMounted) {
-    return (
-      <header
-        className="fixed top-0 left-0 right-0 z-50 w-full bg-white shadow-sm dark:bg-gray-950"
-        role="navigation"
-        aria-label="Menu principal"
-      >
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-6">
-          <Link className="flex items-center gap-2" href="/">
-            <div className="h-16 w-32 relative">
-              <Image
-                src="/logo-nicholas-nascimento.png"
-                alt="Nicholas Advocacia Logo"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <span className="sr-only">Nicholas Advocacia</span>
-          </Link>
-        </div>
-      </header>
-    )
-  }
+  const navItems = [
+    { name: "Início", href: "/#hero" },
+    { name: "Sobre", href: "/sobre" },
+    { name: "Serviços", href: "/servicos" },
+    { name: "Blog", href: "/blog" },
+    { name: "Contato", href: "/contato" },
+  ]
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 w-full bg-white shadow-sm dark:bg-gray-950"
-      role="navigation"
-      aria-label="Menu principal"
+      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+        isScrolled ? "bg-white shadow-md" : "bg-transparent"
+      }`}
     >
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-6">
-        <Link className="flex items-center gap-2" href="/">
-          <div className="h-16 w-32 relative">
-            <Image
-              src="/logo-nicholas-nascimento.png"
-              alt="Nicholas Nascimento Advocacia"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-          <span className="sr-only">Nicholas Advocacia</span>
+      <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-6">
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/logo-nicholas-nascimento.png"
+            alt="Nicholas Advocacia Logo"
+            width={180}
+            height={40}
+            className="h-auto w-auto"
+            priority
+          />
         </Link>
-
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex items-center space-x-4">
-          {navLinks.map((link) => (
+        <nav className="hidden items-center gap-6 lg:flex">
+          {navItems.map((item) => (
             <Link
-              key={link.href}
-              href={link.href}
-              onClick={(e) => {
-                if (link.sectionId && isHomePage) {
-                  e.preventDefault()
-                  handleNavClick(link.sectionId, link.href)
-                }
-              }}
-              className={cn(
-                "font-medium transition-colors hover:text-[#d4b26a]",
-                pathname === link.href ? "text-[#d4b26a]" : "text-gray-500 dark:text-gray-400",
-              )}
+              key={item.name}
+              href={item.href}
+              onClick={(e) => handleNavClick(e, item.href)}
+              className={`text-lg font-medium transition-colors hover:text-[#d4b26a] ${
+                pathname === item.href || activeSection === item.href.substring(2)
+                  ? "text-[#d4b26a]"
+                  : isScrolled
+                    ? "text-gray-700"
+                    : "text-white"
+              }`}
             >
-              {link.label}
+              {item.name}
             </Link>
           ))}
-          {isLoading ? null : user ? (
+          {!isLoading && user ? (
             <>
-              <span className="text-gray-700 dark:text-gray-300">Olá, {user.username}!</span>
+              <Link
+                href="/admin/blog"
+                className={`text-lg font-medium transition-colors hover:text-[#d4b26a] ${
+                  pathname === "/admin/blog" ? "text-[#d4b26a]" : isScrolled ? "text-gray-700" : "text-white"
+                }`}
+              >
+                Admin
+              </Link>
               <Button
                 onClick={logout}
-                variant="outline"
-                className="text-gray-700 border-gray-700 hover:bg-[#d4b26a] hover:text-white bg-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-[#d4b26a]"
+                variant="ghost"
+                size="sm"
+                className="text-lg font-medium text-red-500 hover:text-red-600"
               >
-                Sair
+                <LogOut className="mr-2 h-5 w-5" /> Sair
               </Button>
-              <Link href="/admin/blog">
-                <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
-                  Admin
-                </Button>
-              </Link>
             </>
           ) : (
-            <Link href="/admin/login">
-              <Button
-                variant="ghost"
-                className="h-auto p-0 font-medium text-gray-500 hover:text-[#d4b26a] dark:text-gray-400 dark:hover:text-[#d4b26a]"
-              >
-                <LogInIcon className="mr-2 h-4 w-4" /> Login Admin
-              </Button>
-            </Link>
+            !isLoading &&
+            pathname !== "/admin/login" && (
+              <Link href="/admin/login">
+                <Button variant="ghost" size="sm" className="text-lg font-medium text-white hover:text-[#d4b26a]">
+                  Login Admin
+                </Button>
+              </Link>
+            )
           )}
-          <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
-            <Link
-              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!`}
-              className="flex items-center gap-2"
-              aria-label="Falar com especialista no WhatsApp"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Phone className="h-4 w-4" aria-hidden="true" />
-              Falar com Especialista
-            </Link>
-          </Button>
         </nav>
-
-        {/* Mobile Menu Button */}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <Sheet>
           <SheetTrigger asChild>
-            <Button className="md:hidden bg-transparent" size="icon" variant="outline">
-              <MenuIcon className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="lg:hidden">
+              <Menu className={`h-6 w-6 ${isScrolled ? "text-gray-700" : "text-white"}`} />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right">
-            <div className="flex flex-col gap-4 p-4">
-              {navLinks.map((link) => (
+          <SheetContent side="right" className="w-full sm:max-w-xs">
+            <div className="flex flex-col items-start gap-4 p-4">
+              <Link href="/" className="mb-4">
+                <Image
+                  src="/logo-nicholas-nascimento.png"
+                  alt="Nicholas Advocacia Logo"
+                  width={180}
+                  height={40}
+                  className="h-auto w-auto"
+                />
+              </Link>
+              {navItems.map((item) => (
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => {
-                    if (link.sectionId && isHomePage) {
-                      e.preventDefault()
-                      handleNavClick(link.sectionId, link.href)
-                    }
-                    setIsOpen(false)
-                  }}
-                  className={cn(
-                    "font-medium transition-colors hover:text-[#d4b26a]",
-                    pathname === link.href ? "text-[#d4b26a]" : "text-gray-500 dark:text-gray-400",
-                  )}
+                  key={item.name}
+                  href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  className="text-lg font-medium text-gray-700 hover:text-[#d4b26a]"
                 >
-                  {link.label}
+                  {item.name}
                 </Link>
               ))}
-              {isLoading ? null : user ? (
+              {!isLoading && user ? (
                 <>
-                  <span className="text-sm text-gray-700 block mb-2 dark:text-gray-300">Olá, {user.username}!</span>
-                  <Button
-                    onClick={() => {
-                      logout()
-                      setIsOpen(false)
-                    }}
-                    variant="outline"
-                    className="w-full text-gray-700 border-gray-700 hover:bg-[#d4b26a] hover:text-white bg-transparent mb-2 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-[#d4b26a]"
-                  >
-                    Sair
-                  </Button>
-                  <Link href="/admin/blog">
-                    <Button
-                      className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Admin
-                    </Button>
+                  <Link href="/admin/blog" className="text-lg font-medium text-gray-700 hover:text-[#d4b26a]">
+                    Admin
                   </Link>
+                  <Button
+                    onClick={logout}
+                    variant="ghost"
+                    size="sm"
+                    className="text-lg font-medium text-red-500 hover:text-red-600"
+                  >
+                    <LogOut className="mr-2 h-5 w-5" /> Sair
+                  </Button>
                 </>
               ) : (
-                <Link href="/admin/login">
-                  <Button
-                    className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Login Admin
-                  </Button>
-                </Link>
+                !isLoading &&
+                pathname !== "/admin/login" && (
+                  <Link href="/admin/login">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-lg font-medium text-gray-700 hover:text-[#d4b26a]"
+                    >
+                      Login Admin
+                    </Button>
+                  </Link>
+                )
               )}
-              <Button className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
-                <Link
-                  href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!`}
-                  className="flex items-center gap-2"
-                  onClick={() => setIsOpen(false)}
-                  aria-label="Falar com especialista no WhatsApp"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Phone className="h-4 w-4" aria-hidden="true" />
-                  Falar com Especialista
-                </Link>
-              </Button>
+              <div className="mt-6 w-full space-y-3 border-t pt-4">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Phone className="h-5 w-5" />
+                  <span>{process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+55 (XX) XXXXX-XXXX"}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Mail className="h-5 w-5" />
+                  <span>contato@nicholasadvocacia.com.br</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <MapPin className="h-5 w-5" />
+                  <span>Rua Exemplo, 123, Centro, Cidade - SP</span>
+                </div>
+              </div>
             </div>
           </SheetContent>
         </Sheet>

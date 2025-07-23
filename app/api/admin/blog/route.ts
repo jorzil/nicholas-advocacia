@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { v4 as uuidv4 } from "uuid"
+import { supabase } from "@/lib/supabase" // Import the server-side Supabase client
 
 // In-memory mock database for blog posts
 // In a real application, this would be a persistent database (e.g., Supabase, Neon)
@@ -259,15 +259,67 @@ const blogPosts = [
   },
 ]
 
-export async function GET() {
-  console.log("API /api/admin/blog GET handler hit.") // Log para verificar se a rota é acessada
-  return NextResponse.json(blogPosts)
+export async function GET(request: Request) {
+  console.log("API /api/admin/blog GET handler hit.")
+  try {
+    const { data, error } = await supabase.from("blog_posts").select("*").order("published_at", { ascending: false })
+
+    if (error) {
+      console.error("Error fetching blog posts from Supabase:", error)
+      return NextResponse.json({ message: "Failed to fetch blog posts", error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json(data)
+  } catch (e: any) {
+    console.error("Unexpected error in GET /api/admin/blog:", e)
+    return NextResponse.json({ message: "Internal server error", error: e.message }, { status: 500 })
+  }
 }
 
 export async function POST(request: Request) {
-  const newPost = await request.json()
-  const id = uuidv4()
-  const postWithId = { ...newPost, id, publishedAt: new Date().toISOString() }
-  blogPosts.push(postWithId)
-  return NextResponse.json(postWithId, { status: 201 })
+  try {
+    const newPost = await request.json()
+    console.log("Received new post for creation:", newPost)
+
+    // Ensure slug is unique and valid
+    const { data: existingPost, error: existingError } = await supabase
+      .from("blog_posts")
+      .select("id")
+      .eq("slug", newPost.slug)
+      .single()
+
+    if (existingPost) {
+      return NextResponse.json({ message: "Slug já existe. Por favor, escolha outro." }, { status: 409 })
+    }
+    if (existingError && existingError.code !== "PGRST116") {
+      // PGRST116 means no rows found (expected for unique check)
+      console.error("Error checking existing slug:", existingError)
+      throw new Error(existingError.message)
+    }
+
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .insert({
+        title: newPost.title,
+        slug: newPost.slug,
+        content: newPost.content,
+        author: newPost.author,
+        published_at: newPost.publishedAt, // Supabase handles ISO string
+        status: newPost.status,
+        tags: newPost.tags,
+        featured_image: newPost.featuredImage,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error inserting new blog post to Supabase:", error)
+      return NextResponse.json({ message: "Failed to create blog post", error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json(data, { status: 201 })
+  } catch (e: any) {
+    console.error("Unexpected error in POST /api/admin/blog:", e)
+    return NextResponse.json({ message: "Internal server error", error: e.message }, { status: 500 })
+  }
 }

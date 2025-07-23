@@ -1,114 +1,45 @@
 import { NextResponse } from "next/server"
 
-const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY
-const GOOGLE_PLACE_ID = process.env.GOOGLE_PLACE_ID || "ChIJce_wa8KB14YR_G9vPWnPzkA" // Default to a known ID if not set
-const GOOGLE_BUSINESS_NAME = process.env.GOOGLE_BUSINESS_NAME || "Nicholas Nascimento Advocacia e Consultoria Jurídica"
-
-// Fallback reviews data
-const fallbackReviews = [
-  {
-    author_name: "Maria Silva",
-    rating: 5,
-    text: "Excelente atendimento! O Dr. Nicholas resolveu meu problema de usucapião com muita competência e agilidade. Recomendo!",
-    time: Date.now() / 1000, // Convert ms to seconds for consistency with Google API
-    profile_photo_url: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    author_name: "João Santos",
-    rating: 5,
-    text: "Profissional muito competente e atencioso. Me ajudou com a regularização do meu imóvel. Serviço de qualidade!",
-    time: Date.now() / 1000 - 86400 * 5, // 5 days ago
-    profile_photo_url: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    author_name: "Ana Costa",
-    rating: 5,
-    text: "Escritório de confiança! Atendimento personalizado e resultados excelentes. Muito satisfeita com os serviços.",
-    time: Date.now() / 1000 - 86400 * 10, // 10 days ago
-    profile_photo_url: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    author_name: "Carlos Oliveira",
-    rating: 5,
-    text: "Advogado especialista em direito imobiliário. Resolveu minha questão condominial rapidamente. Muito satisfeita!",
-    time: Date.now() / 1000 - 86400 * 15, // 15 days ago
-    profile_photo_url: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    author_name: "Fernanda Lima",
-    rating: 5,
-    text: "Excelente trabalho na regularização do meu imóvel. Dr. Nicholas é muito atencioso e explica tudo detalhadamente.",
-    time: Date.now() / 1000 - 86400 * 20, // 20 days ago
-    profile_photo_url: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    author_name: "Pedro Almeida",
-    rating: 5,
-    text: "Atendimento rápido e eficiente. Recomendo para quem busca soluções em direito imobiliário.",
-    time: Date.now() / 1000 - 86400 * 25, // 25 days ago
-    profile_photo_url: "/placeholder.svg?height=40&width=40",
-  },
-]
-
 export async function GET() {
-  const defaultResponse = {
-    reviews: fallbackReviews,
-    rating: 5.0,
-    user_ratings_total: 25, // A reasonable default total
-    name: GOOGLE_BUSINESS_NAME,
-    place_id: GOOGLE_PLACE_ID,
-    source: "fallback",
+  const placeId = process.env.GOOGLE_PLACE_ID
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY
+
+  if (!placeId || !apiKey) {
+    console.error("GOOGLE_PLACE_ID or GOOGLE_PLACES_API_KEY is not set.")
+    return NextResponse.json({ message: "API keys for Google Places are not configured." }, { status: 500 })
   }
 
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews&key=${apiKey}`
+  console.log("Attempting to fetch Google Reviews from URL:", url) // Log the full URL
+
   try {
-    // If API key or Place ID is missing, return fallback data immediately
-    if (!GOOGLE_PLACES_API_KEY || !GOOGLE_PLACE_ID) {
-      console.log("Google Places API credentials not configured, using fallback reviews.")
-      return NextResponse.json({ ...defaultResponse, error: "API credentials missing." })
-    }
-
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${GOOGLE_PLACE_ID}&fields=reviews,rating,user_ratings_total,name&key=${GOOGLE_PLACES_API_KEY}&language=pt-BR`
-    console.log("Attempting to fetch Google Places API from URL:", url) // Log the full URL
-
-    const response = await fetch(url, {
-      next: { revalidate: 3600 }, // Cache for 1 hour to reduce API calls
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error(
-        `Google Places API HTTP error: ${response.status} ${response.statusText}. Response body: ${errorText}`,
-      )
-      return NextResponse.json({ ...defaultResponse, error: `HTTP error: ${response.status}` })
-    }
-
+    const response = await fetch(url)
     const data = await response.json()
 
-    console.log("Google Places API raw response data:", JSON.stringify(data, null, 2)) // Log raw data for debugging
-    console.log("Google Places API status:", data.status)
+    console.log("Google Places API raw response:", JSON.stringify(data, null, 2)) // Log raw response
 
-    if (data.status === "OK" && data.result) {
-      const reviews = data.result.reviews || []
-      return NextResponse.json({
-        reviews: reviews.length > 0 ? reviews : fallbackReviews,
-        rating: data.result.rating || 5.0,
-        user_ratings_total: data.result.user_ratings_total || defaultResponse.user_ratings_total,
-        name: data.result.name || GOOGLE_BUSINESS_NAME,
-        place_id: GOOGLE_PLACE_ID,
-        source: reviews.length > 0 ? "google" : "fallback",
-      })
-    } else {
-      console.warn(`[google-reviews] Places API responded with ${data.status}. Serving fallback testimonials.`)
-      return NextResponse.json({
-        ...defaultResponse,
-        error: `Google Places status: ${data.status}`,
-      })
+    if (data.status !== "OK") {
+      console.error("Google Places API status:", data.status, "Error message:", data.error_message)
+      // Provide a more specific error message based on Google's status
+      let errorMessage = "Failed to fetch Google reviews."
+      if (data.status === "NOT_FOUND") {
+        errorMessage = "Google Place ID not found or invalid. Please check GOOGLE_PLACE_ID."
+      } else if (data.status === "INVALID_REQUEST") {
+        errorMessage = "Invalid request to Google Places API. Check API key or parameters."
+      } else if (data.status === "REQUEST_DENIED") {
+        errorMessage = "Google Places API request denied. Check API key permissions or billing."
+      }
+      return NextResponse.json({ message: errorMessage, googleStatus: data.status }, { status: 500 })
     }
+
+    // Filter out reviews without text content if necessary, or just return all
+    const reviews = data.result.reviews || []
+    return NextResponse.json(reviews)
   } catch (error) {
-    console.error("Error with Google Places API, using fallback reviews:", error)
-    return NextResponse.json({
-      ...defaultResponse,
-      error: "Failed to fetch from Google Places API due to an exception.",
-    })
+    console.error("Error fetching Google reviews:", error)
+    return NextResponse.json(
+      { message: "An unexpected error occurred while fetching Google reviews." },
+      { status: 500 },
+    )
   }
 }
