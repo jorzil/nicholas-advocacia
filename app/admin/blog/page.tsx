@@ -37,7 +37,10 @@ export default function BlogManagementPage() {
     setError(null)
     try {
       // Usando NEXT_PUBLIC_APP_URL para garantir que a chamada funcione em produção
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog`)
+      // Adicionado `credentials: 'include'` para garantir que os cookies de autenticação sejam enviados
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog`, {
+        credentials: "include",
+      })
       if (!response.ok) {
         // Tenta ler a resposta como texto para depuração se não for JSON
         const errorText = await response.text()
@@ -68,6 +71,7 @@ export default function BlogManagementPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog/${postToDelete}`, {
         method: "DELETE",
+        credentials: "include", // Adicionado para garantir que os cookies sejam enviados
       })
 
       if (!response.ok) {
