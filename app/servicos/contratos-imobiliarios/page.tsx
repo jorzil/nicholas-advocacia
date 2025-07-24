@@ -1,144 +1,144 @@
 import Image from "next/image"
-import Link from "next/link"
-import { CheckCircle, Phone, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ContactForm } from "@/components/contact-form" // Reusing general contact form
-import { FadeIn } from "@/components/fade-in"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Breadcrumb } from "@/components/breadcrumb"
 import { ServiceSidebar } from "@/components/service-sidebar"
-
-export const metadata = {
-  title: "Contratos Imobiliários - Nicholas Advocacia",
-  description: "Assessoria jurídica completa para elaboração e revisão de contratos imobiliários e due diligence.",
-  keywords:
-    "contratos imobiliários, due diligence, compra e venda de imóveis, aluguel, locação, advogado imobiliário, revisão de contrato",
-  openGraph: {
-    title: "Contratos Imobiliários - Nicholas Advocacia",
-    description: "Assessoria jurídica completa para elaboração e revisão de contratos imobiliários e due diligence.",
-    url: "https://www.nicholasadvocacia.com.br/servicos/contratos-imobiliarios",
-  },
-}
+import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer"
+import { SchedulingForm } from "@/components/scheduling-form"
+import { FadeIn } from "@/components/fade-in"
 
 export default function ContratosImobiliariosPage() {
+  const breadcrumbItems = [
+    { label: "Serviços", href: "/servicos" },
+    { label: "Contratos Imobiliários", href: "/servicos/contratos-imobiliarios" },
+  ]
+
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 min-h-[400px] flex items-center">
-        <div className="container relative z-10 mx-auto px-4 lg:px-6">
-          <div className="max-w-4xl">
-            <FadeIn direction="up" delay={0.2} className="space-y-6 text-left">
-              <div>
-                <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
-                  Contratos Imobiliários e Due Diligence
-                </h1>
-                <p className="text-xl text-gray-200 mb-6 max-w-3xl">
-                  Garanta transações seguras com contratos bem elaborados e análise de riscos.
-                </p>
-                <Button size="lg" className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
-                  <Link
-                    href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20contratos%20imobiliários!"
-                    className="flex items-center gap-2"
-                  >
-                    Falar com Especialista
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </Button>
-              </div>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <section
+          className="relative w-full h-[400px] bg-cover bg-center"
+          style={{ backgroundImage: "url('/real-estate-contract-signing.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <FadeIn>
+              <h1 className="text-5xl font-bold text-white text-center">Contratos Imobiliários</h1>
             </FadeIn>
           </div>
-        </div>
+        </section>
 
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/real-estate-contract-signing.png" // Placeholder image
-            alt="Fundo de contratos imobiliários"
-            fill
-            className="object-cover"
-            priority
-          />
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/50"></div>
-        </div>
-      </section>
+        <section className="py-12 md:py-20 bg-gray-50">
+          <div className="container px-4 md:px-6">
+            <Breadcrumb items={breadcrumbItems} />
+            <div className="flex flex-col lg:flex-row gap-12 mt-8">
+              <div className="lg:w-2/3 space-y-8">
+                <FadeIn>
+                  <h2 className="text-3xl font-bold text-[#1e2c49]">A Importância de Contratos Seguros</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    Contratos imobiliários são a base de qualquer transação envolvendo bens imóveis. A elaboração e
+                    análise cuidadosa desses documentos são cruciais para prevenir litígios, garantir a segurança
+                    jurídica das partes e assegurar que todos os termos e condições sejam claros e justos. Nosso
+                    escritório oferece assessoria completa para todos os tipos de contratos imobiliários.
+                  </p>
+                  <Image
+                    src="/real-estate-contract-signing.png"
+                    alt="Assinatura de contrato imobiliário"
+                    width={800}
+                    height={450}
+                    className="rounded-lg shadow-md mt-6"
+                  />
+                </FadeIn>
 
-      {/* Main Content Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <ServiceSidebar />
-            </div>
+                <FadeIn delay={0.2}>
+                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Nossos Serviços em Contratos</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    Oferecemos expertise na elaboração, revisão e negociação de diversos contratos imobiliários:
+                  </p>
+                  <Accordion type="single" collapsible className="w-full mt-6">
+                    <AccordionItem value="item-1">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Contratos de Compra e Venda
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Elaboração e análise de contratos para aquisição ou alienação de imóveis, garantindo a segurança
+                        da transação.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Contratos de Locação
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Assessoria na criação de contratos de aluguel residenciais e comerciais, protegendo locadores e
+                        locatários.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-3">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Contratos de Permuta
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Elaboração de contratos para troca de imóveis, com ou sem torna.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-4">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Contratos de Doação
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Assessoria na doação de bens imóveis, com ou sem cláusulas restritivas.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-5">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Contratos de Construção e Empreitada
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Elaboração de contratos para obras e reformas, definindo responsabilidades e prazos.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-6">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Pactuação de Garantias
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Assessoria na inclusão de garantias em contratos, como fiança, hipoteca e alienação fiduciária.
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </FadeIn>
 
-            {/* Content */}
-            <div className="lg:col-span-3">
-              <article className="prose prose-lg max-w-none text-gray-700">
-                <h2>A Importância de Contratos Imobiliários Seguros</h2>
-                <p>
-                  Contratos imobiliários são a base de qualquer transação envolvendo bens imóveis. Um contrato bem
-                  elaborado e revisado por um especialista é essencial para prevenir litígios, garantir o cumprimento
-                  das obrigações e proteger os interesses de todas as partes envolvidas. Erros ou omissões podem gerar
-                  grandes prejuízos e dores de cabeça.
-                </p>
+                <FadeIn delay={0.3}>
+                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Por que nos escolher?</h2>
+                  <ul className="list-disc list-inside text-lg text-gray-700 space-y-2 mt-4">
+                    <li>Experiência comprovada em direito imobiliário.</li>
+                    <li>Análise minuciosa para identificar riscos e oportunidades.</li>
+                    <li>Elaboração de contratos claros, completos e juridicamente sólidos.</li>
+                    <li>Negociação de termos e condições para proteger seus interesses.</li>
+                    <li>Atendimento personalizado e focado nas suas necessidades.</li>
+                  </ul>
+                </FadeIn>
 
-                <h2>Nossos Serviços em Contratos Imobiliários</h2>
-                <p>Oferecemos assessoria completa para:</p>
-                <ul>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Elaboração de Contratos:</strong> Criação de contratos de compra e venda, locação (aluguel),
-                    permuta, doação, comodato, entre outros, personalizados para sua necessidade e com todas as
-                    cláusulas de segurança.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Revisão de Contratos:</strong> Análise minuciosa de contratos propostos por terceiros,
-                    identificando riscos, cláusulas abusivas ou desfavoráveis, e sugerindo alterações para proteger seus
-                    direitos.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Due Diligence Imobiliária:</strong> Investigação completa da situação jurídica do imóvel e
-                    das partes envolvidas na transação, incluindo certidões, histórico de propriedade, débitos e
-                    pendências, para garantir uma compra ou venda segura.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Negociação de Cláusulas:</strong> Apoio na negociação de termos e condições contratuais,
-                    buscando o melhor acordo para você.
-                  </li>
-                </ul>
+                <FadeIn delay={0.4}>
+                  <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                    <h2 className="text-3xl font-bold text-[#1e2c49] mb-6 text-center">Fale Conosco</h2>
+                    <p className="text-lg text-gray-700 mb-6 text-center">
+                      Garanta a segurança de suas transações imobiliárias. Entre em contato para uma consulta.
+                    </p>
+                    <SchedulingForm />
+                  </div>
+                </FadeIn>
+              </div>
 
-                <h2>Por que Escolher a Nicholas Advocacia?</h2>
-                <p>
-                  Com nossa expertise em Direito Imobiliário, garantimos que seus contratos serão elaborados ou
-                  revisados com a máxima segurança jurídica, protegendo seu patrimônio e evitando futuros problemas.
-                </p>
-
-                <div className="mt-8 text-center">
-                  <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
-                    <Link
-                      href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20contratos%20imobiliários!"
-                      className="flex items-center gap-2"
-                    >
-                      <Phone className="h-5 w-5" />
-                      Falar com Especialista
-                    </Link>
-                  </Button>
-                </div>
-              </article>
-
-              {/* Contact Form Section */}
-              <div className="mt-16 p-6 bg-gray-50 rounded-lg shadow-md">
-                <h2 className="text-3xl font-bold text-[#1e2c49] mb-8 text-center">
-                  Solicite uma Análise de Contrato ou Due Diligence
-                </h2>
-                <ContactForm />
+              <div className="lg:w-1/3">
+                <ServiceSidebar />
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <WhatsAppButton />
+      <Footer />
     </div>
   )
 }

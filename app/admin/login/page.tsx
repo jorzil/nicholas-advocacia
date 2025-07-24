@@ -2,75 +2,78 @@
 
 import type React from "react"
 
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
-import { useAuth } from "@/contexts/auth-context" // Import useAuth
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [isPending, startTransition] = useTransition()
+  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
-  const { login } = useAuth() // Get login function from AuthContext
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    startTransition(async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/auth`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        })
+    setLoading(true)
 
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.message || "Erro de autenticação.")
-        }
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-        const data = await response.json()
-        login(data.user.username, data.token) // Use the login function from AuthContext
+      if (res.ok) {
         toast({
           title: "Login bem-sucedido!",
-          description: "Você foi logado com sucesso.",
+          description: "Você foi redirecionado para o painel de administração.",
         })
-        // Redirection is now handled by the login function in AuthContext
-      } catch (error: any) {
+        router.push("/admin/blog")
+        router.refresh() // Refresh to update session context
+      } else {
+        const errorData = await res.json()
         toast({
-          title: "Erro de Login",
-          description: error.message || "Credenciais inválidas. Tente novamente.",
+          title: "Erro no Login",
+          description: errorData.error || "Credenciais inválidas. Tente novamente.",
           variant: "destructive",
         })
       }
-    })
+    } catch (error) {
+      console.error("Erro ao fazer login:", error)
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro de rede. Por favor, tente novamente mais tarde.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">Login Admin</CardTitle>
-          <CardDescription>Entre com suas credenciais para acessar o painel administrativo.</CardDescription>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center text-[#1e2c49]">Login Admin</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username">Usuário</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="admin"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -79,15 +82,20 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="********"
+                placeholder="Sua senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Entrar
+            <Button type="submit" className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c0a05e]" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Entrando...
+                </>
+              ) : (
+                "Entrar"
+              )}
             </Button>
           </form>
         </CardContent>

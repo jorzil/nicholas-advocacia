@@ -1,153 +1,144 @@
 import Image from "next/image"
-import Link from "next/link"
-import { CheckCircle, Phone, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ContactForm } from "@/components/contact-form" // Reusing general contact form
-import { FadeIn } from "@/components/fade-in"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Breadcrumb } from "@/components/breadcrumb"
 import { ServiceSidebar } from "@/components/service-sidebar"
-
-export const metadata = {
-  title: "Incorporação Imobiliária - Nicholas Advocacia",
-  description: "Assessoria jurídica completa para incorporadoras, construtoras e investidores no mercado imobiliário.",
-  keywords:
-    "incorporação imobiliária, construtora, investidor imobiliário, direito imobiliário, advogado incorporação, registro de incorporação",
-  openGraph: {
-    title: "Incorporação Imobiliária - Nicholas Advocacia",
-    description:
-      "Assessoria jurídica completa para incorporadoras, construtoras e investidores no mercado imobiliário.",
-    url: "https://www.nicholasadvocacia.com.br/servicos/incorporacao-imobiliaria",
-  },
-}
+import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer"
+import { SchedulingForm } from "@/components/scheduling-form"
+import { FadeIn } from "@/components/fade-in"
 
 export default function IncorporacaoImobiliariaPage() {
+  const breadcrumbItems = [
+    { label: "Serviços", href: "/servicos" },
+    { label: "Incorporação Imobiliária", href: "/servicos/incorporacao-imobiliaria" },
+  ]
+
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 min-h-[400px] flex items-center">
-        <div className="container relative z-10 mx-auto px-4 lg:px-6">
-          <div className="max-w-4xl">
-            <FadeIn direction="up" delay={0.2} className="space-y-6 text-left">
-              <div>
-                <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
-                  Incorporação Imobiliária
-                </h1>
-                <p className="text-xl text-gray-200 mb-6 max-w-3xl">
-                  Assessoria jurídica especializada para seus projetos de incorporação.
-                </p>
-                <Button size="lg" className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
-                  <Link
-                    href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20incorporação%20imobiliária!"
-                    className="flex items-center gap-2"
-                  >
-                    Falar com Especialista
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </Button>
-              </div>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <section
+          className="relative w-full h-[400px] bg-cover bg-center"
+          style={{ backgroundImage: "url('/building-document-icon.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <FadeIn>
+              <h1 className="text-5xl font-bold text-white text-center">Incorporação Imobiliária</h1>
             </FadeIn>
           </div>
-        </div>
+        </section>
 
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/building-document-icon.png" // Placeholder image
-            alt="Fundo de incorporação imobiliária"
-            fill
-            className="object-cover"
-            priority
-          />
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/50"></div>
-        </div>
-      </section>
+        <section className="py-12 md:py-20 bg-gray-50">
+          <div className="container px-4 md:px-6">
+            <Breadcrumb items={breadcrumbItems} />
+            <div className="flex flex-col lg:flex-row gap-12 mt-8">
+              <div className="lg:w-2/3 space-y-8">
+                <FadeIn>
+                  <h2 className="text-3xl font-bold text-[#1e2c49]">Assessoria Completa para Incorporadores</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    A incorporação imobiliária é um processo complexo que envolve diversas etapas legais, desde a
+                    aquisição do terreno até a entrega das unidades. Nosso escritório oferece assessoria jurídica
+                    especializada para incorporadores, construtoras e investidores, garantindo a segurança e a
+                    conformidade de seus projetos.
+                  </p>
+                  <Image
+                    src="/building-document-icon.png"
+                    alt="Ícone de edifício e documento"
+                    width={800}
+                    height={450}
+                    className="rounded-lg shadow-md mt-6"
+                  />
+                </FadeIn>
 
-      {/* Main Content Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <ServiceSidebar />
-            </div>
+                <FadeIn delay={0.2}>
+                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Nossos Serviços em Incorporação</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    Atuamos em todas as fases da incorporação imobiliária:
+                  </p>
+                  <Accordion type="single" collapsible className="w-full mt-6">
+                    <AccordionItem value="item-1">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Análise de Viabilidade Jurídica
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Verificação da regularidade do terreno, licenças e permissões necessárias para o empreendimento.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Elaboração de Memorial de Incorporação
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Preparação e registro do memorial de incorporação no Cartório de Registro de Imóveis.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-3">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Contratos de Construção e Venda
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Elaboração de contratos de promessa de compra e venda, contratos de construção por empreitada ou
+                        administração.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-4">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Assessoria em Financiamento
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Orientação jurídica para obtenção de financiamentos bancários para o empreendimento.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-5">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Questões Tributárias
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Análise e planejamento tributário para otimizar a carga fiscal do projeto.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-6">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Regularização Pós-Obra
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Assessoria para obtenção de habite-se, averbação da construção e individualização das
+                        matrículas.
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </FadeIn>
 
-            {/* Content */}
-            <div className="lg:col-span-3">
-              <article className="prose prose-lg max-w-none text-gray-700">
-                <h2>O que é Incorporação Imobiliária?</h2>
-                <p>
-                  A incorporação imobiliária é a atividade que visa a construção de edificações ou conjunto de
-                  edificações, compostas de unidades autônomas, para alienação total ou parcial. É um processo complexo
-                  que envolve diversas etapas jurídicas, desde a aquisição do terreno até a entrega das chaves aos
-                  compradores.
-                </p>
+                <FadeIn delay={0.3}>
+                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Por que nos escolher?</h2>
+                  <ul className="list-disc list-inside text-lg text-gray-700 space-y-2 mt-4">
+                    <li>Experiência aprofundada em direito imobiliário e urbanístico.</li>
+                    <li>Visão estratégica para mitigar riscos e otimizar resultados.</li>
+                    <li>Assessoria completa em todas as etapas do projeto.</li>
+                    <li>Agilidade na resolução de questões burocráticas.</li>
+                    <li>Compromisso com a segurança jurídica e o sucesso do seu empreendimento.</li>
+                  </ul>
+                </FadeIn>
 
-                <h2>Nossa Assessoria em Incorporação Imobiliária</h2>
-                <p>Oferecemos suporte jurídico completo para incorporadoras, construtoras e investidores, incluindo:</p>
-                <ul>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Análise de Viabilidade:</strong> Estudo da viabilidade jurídica do projeto, incluindo
-                    análise de riscos e licenças necessárias.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Registro da Incorporação:</strong> Elaboração e registro de todos os documentos necessários
-                    no Cartório de Registro de Imóveis.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Elaboração de Contratos:</strong> Criação de contratos de promessa de compra e venda,
-                    contratos de construção, contratos com fornecedores e prestadores de serviços.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Assessoria em Vendas:</strong> Suporte jurídico na fase de comercialização das unidades,
-                    garantindo a segurança das transações.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Regularização Pós-Obra:</strong> Apoio na obtenção do habite-se e na individualização das
-                    matrículas.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    <strong>Resolução de Conflitos:</strong> Atuação em litígios que possam surgir durante o processo de
-                    incorporação.
-                  </li>
-                </ul>
+                <FadeIn delay={0.4}>
+                  <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                    <h2 className="text-3xl font-bold text-[#1e2c49] mb-6 text-center">Fale Conosco</h2>
+                    <p className="text-lg text-gray-700 mb-6 text-center">
+                      Garanta a segurança e o sucesso do seu projeto de incorporação.
+                    </p>
+                    <SchedulingForm />
+                  </div>
+                </FadeIn>
+              </div>
 
-                <h2>Por que Escolher a Nicholas Advocacia?</h2>
-                <p>
-                  Com nossa experiência e conhecimento aprofundado do mercado imobiliário, garantimos a segurança
-                  jurídica e a conformidade de seus projetos de incorporação, minimizando riscos e otimizando
-                  resultados.
-                </p>
-
-                <div className="mt-8 text-center">
-                  <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
-                    <Link
-                      href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20incorporação%20imobiliária!"
-                      className="flex items-center gap-2"
-                    >
-                      <Phone className="h-5 w-5" />
-                      Falar com Especialista
-                    </Link>
-                  </Button>
-                </div>
-              </article>
-
-              {/* Contact Form Section */}
-              <div className="mt-16 p-6 bg-gray-50 rounded-lg shadow-md">
-                <h2 className="text-3xl font-bold text-[#1e2c49] mb-8 text-center">
-                  Solicite Assessoria para seu Projeto de Incorporação
-                </h2>
-                <ContactForm />
+              <div className="lg:w-1/3">
+                <ServiceSidebar />
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <WhatsAppButton />
+      <Footer />
     </div>
   )
 }

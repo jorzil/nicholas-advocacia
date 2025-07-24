@@ -1,140 +1,129 @@
-import Image from "next/image"
-import { Calendar, User, Clock } from "lucide-react"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { SocialShare } from "@/components/social-share"
-import { CtaButton } from "@/components/cta-button"
 import { BlogSidebar } from "@/components/blog-sidebar"
-import { calculateReadTime, formatDate } from "@/lib/utils"
+import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer"
+import { FadeIn } from "@/components/fade-in"
 
-export const metadata = {
-  title: "Direito Condominial: Gestão e Solução de Conflitos em Condomínios - Nicholas Advocacia",
-  description:
-    "Entenda o Direito Condominial, o papel do síndico e como resolver conflitos em condomínios de forma eficaz.",
-  keywords:
-    "direito condominial, condomínio, síndico, conflitos condominiais, advogado condominial, gestão de condomínios",
-  openGraph: {
-    title: "Direito Condominial: Gestão e Solução de Conflitos em Condomínios - Nicholas Advocacia",
-    description:
-      "Entenda o Direito Condominial, o papel do síndico e como resolver conflitos em condomínios de forma eficaz.",
-    url: "https://www.nicholasadvocacia.com.br/blog/direito-condominial-gestao-conflitos",
-    images: ["/blog-direito-condominial.png"],
-  },
-}
+export default function DireitoCondominialGestaoConflitosPage() {
+  const breadcrumbItems = [
+    { label: "Blog", href: "/blog" },
+    {
+      label: "Direito Condominial: Gestão de Conflitos e Regras Essenciais",
+      href: "/blog/direito-condominial-gestao-conflitos",
+    },
+  ]
 
-export default function BlogPostPage() {
-  const post = {
-    title: "Direito Condominial: Gestão e Solução de Conflitos em Condomínios",
-    author: "Nicholas Nascimento",
-    publishedAt: "2023-01-05T10:00:00Z",
-    featuredImage: "/blog-direito-condominial.png",
-    content: `
-      <h2>Introdução</h2>
-      <p>A vida em condomínio, seja ele residencial ou comercial, é regida por um conjunto de regras e leis que visam garantir a boa convivência e a manutenção do patrimônio comum. O Direito Condominial é o ramo jurídico que trata dessas relações, oferecendo ferramentas para a gestão eficiente e a solução de conflitos. Síndicos, administradoras e condôminos precisam estar cientes de seus direitos e deveres para evitar problemas.</p>
-      <h2>Principais Aspectos do Direito Condominial</h2>
-      <ul>
-        <li><strong>Convenção de Condomínio e Regimento Interno:</strong> São os documentos que estabelecem as regras de convivência, direitos e deveres dos condôminos, forma de administração, e as penalidades para infrações.</li>
-        <li><strong>Assembleias Condominiais:</strong> São o principal fórum de decisão do condomínio, onde são aprovadas contas, eleitos síndicos, e deliberadas sobre obras e outras questões importantes.</li>
-        <li><strong>Cobrança de Cotas Condominiais:</strong> A inadimplência é um dos maiores desafios dos condomínios. O Direito Condominial oferece meios legais para a cobrança de dívidas, incluindo ações judiciais.</li>
-        <li><strong>Obras em Condomínios:</strong> Regras para a realização de obras nas áreas comuns e nas unidades privativas, exigindo aprovações e licenças específicas.</li>
-        <li><strong>Conflitos entre Vizinhos:</strong> Questões como barulho, animais de estimação, uso de áreas comuns, e danos a propriedades vizinhas.</li>
-      </ul>
-      <h2>O Papel do Síndico e da Administradora</h2>
-      <p>O síndico é o representante legal do condomínio, responsável pela sua administração e pela execução das decisões das assembleias. A administradora, por sua vez, presta serviços de apoio ao síndico, como gestão financeira, contábil e de pessoal. Ambos precisam de suporte jurídico para atuar em conformidade com a lei e evitar responsabilidades.</p>
-      <h2>Solução de Conflitos em Condomínios</h2>
-      <p>Conflitos são inevitáveis em condomínios, mas podem ser resolvidos de forma eficaz com a intervenção jurídica adequada:</p>
-      <ol>
-        <li><strong>Mediação e Conciliação:</strong> Buscar um acordo amigável entre as partes, com a ajuda de um mediador.</li>
-        <li><strong>Notificação Extrajudicial:</strong> Formalizar a reclamação e a busca por uma solução antes de recorrer à justiça.</li>
-        <li><strong>Ações Judiciais:</strong> Em casos de inadimplência persistente, danos, ou descumprimento grave das regras, a via judicial pode ser necessária para garantir os direitos do condomínio ou dos condôminos.</li>
-      </ol>
-      <h2>Como a Nicholas Advocacia Pode Ajudar?</h2>
-      <p>Nosso escritório oferece assessoria jurídica completa em Direito Condominial para síndicos, administradoras e condôminos, incluindo:</p>
-      <ul>
-        <li>Elaboração e revisão de Convenções e Regimentos Internos.</li>
-        <li>Assessoria em assembleias e na tomada de decisões.</li>
-        <li>Cobrança judicial e extrajudicial de cotas condominiais.</li>
-        <li>Defesa em ações judiciais e extrajudiciais.</li>
-        <li>Mediação de conflitos entre vizinhos.</li>
-        <li>Orientação sobre obras e responsabilidades.</li>
-      </ul>
-      <p>Com nossa expertise, seu condomínio terá a segurança jurídica necessária para uma gestão eficiente e uma convivência harmoniosa.</p>
-    `,
-  }
-
-  const readTime = calculateReadTime(post.content)
+  const articleTitle = "Direito Condominial: Gestão de Conflitos e Regras Essenciais"
+  const articleUrl = `${process.env.NEXT_PUBLIC_APP_URL}/blog/direito-condominial-gestao-conflitos`
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 min-h-[300px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={post.featuredImage || "/placeholder.svg"}
-            alt={post.title}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/60"></div>
-        </div>
-        <div className="container relative z-10 mx-auto px-4 lg:px-6 text-white">
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Blog", href: "/blog" },
-              { label: "Direito Condominial", href: "/blog/direito-condominial-gestao-conflitos" },
-            ]}
-          />
-          <h1 className="mt-6 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">{post.title}</h1>
-          <div className="mt-4 flex items-center gap-4 text-lg text-gray-200">
-            <div className="flex items-center">
-              <User className="mr-2 h-5 w-5" />
-              <span>{post.author}</span>
-            </div>
-            <div className="flex items-center">
-              <Calendar className="mr-2 h-5 w-5" />
-              <span>{formatDate(post.publishedAt)}</span>
-            </div>
-            <div className="flex items-center">
-              <Clock className="mr-2 h-5 w-5" />
-              <span>{readTime}</span>
-            </div>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <section
+          className="relative w-full h-[300px] bg-cover bg-center"
+          style={{ backgroundImage: "url('/blog-direito-condominial-gestao-conflitos.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <FadeIn>
+              <h1 className="text-4xl font-bold text-white text-center px-4">{articleTitle}</h1>
+            </FadeIn>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Main Content Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            {/* Blog Post Content */}
-            <div className="lg:col-span-3">
-              <article className="prose prose-lg max-w-none text-gray-700">
-                <div dangerouslySetInnerHTML={{ __html: post.content }} />
-              </article>
+        <section className="py-8 md:py-12 bg-gray-50">
+          <div className="container px-4 md:px-6">
+            <Breadcrumb items={breadcrumbItems} />
+            <div className="flex flex-col lg:flex-row gap-12 mt-8">
+              <div className="lg:w-2/3 space-y-8">
+                <FadeIn>
+                  <div className="prose prose-lg max-w-none text-gray-700">
+                    <p>
+                      A vida em condomínio, seja ele residencial ou comercial, é regida por um conjunto de regras e leis
+                      que visam garantir a convivência harmoniosa e a boa gestão do patrimônio comum. O Direito
+                      Condominial é a área jurídica que trata dessas normas, e sua compreensão é fundamental para
+                      síndicos, administradoras e moradores.
+                    </p>
 
-              {/* Share Buttons */}
-              <div className="mt-12 border-t border-gray-200 pt-8">
-                <h3 className="text-xl font-bold text-[#1e2c49] mb-4">Compartilhe este artigo:</h3>
-                <SocialShare
-                  title={post.title}
-                  url={`https://www.nicholasadvocacia.com.br/blog/${post.title.toLowerCase().replace(/\s+/g, "-")}`}
-                />
+                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">As Regras Essenciais do Condomínio</h2>
+                    <p>
+                      Os principais documentos que regem um condomínio são a Convenção de Condomínio e o Regimento
+                      Interno.
+                    </p>
+                    <ul className="list-disc list-inside">
+                      <li>
+                        <strong>Convenção de Condomínio:</strong> É a lei máxima do condomínio, estabelecendo direitos e
+                        deveres dos condôminos, a forma de administração, as despesas, as sanções, e a destinação das
+                        áreas comuns. Sua alteração exige quórum qualificado.
+                      </li>
+                      <li>
+                        <strong>Regimento Interno:</strong> Detalha as regras de convivência, uso das áreas comuns,
+                        horários, normas para animais de estimação, multas por infrações, etc. É mais flexível para
+                        alterações.
+                      </li>
+                    </ul>
+                    <p>
+                      Além desses, o Código Civil Brasileiro (Lei nº 10.406/2002) e leis específicas (como a Lei do
+                      Inquilinato) também aplicam-se à vida condominial.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Gestão de Conflitos no Condomínio</h2>
+                    <p>Conflitos são inevitáveis em ambientes de convivência coletiva. Os mais comuns incluem:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Barulho excessivo.</li>
+                      <li>Uso indevido de áreas comuns.</li>
+                      <li>Inadimplência de taxas condominiais.</li>
+                      <li>Vagas de garagem.</li>
+                      <li>Animais de estimação.</li>
+                      <li>Obras e reformas.</li>
+                    </ul>
+                    <p>
+                      A melhor forma de gerenciar esses conflitos é através da comunicação clara, mediação e, quando
+                      necessário, a aplicação das sanções previstas na Convenção e no Regimento Interno.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">
+                      O Papel do Síndico e da Assessoria Jurídica
+                    </h2>
+                    <p>
+                      O síndico é o principal responsável pela gestão do condomínio e pela aplicação das regras. No
+                      entanto, a complexidade das questões jurídicas e administrativas exige, muitas vezes, o suporte de
+                      uma assessoria jurídica especializada em Direito Condominial.
+                    </p>
+                    <p>Um advogado pode auxiliar o síndico em:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Cobrança de inadimplentes.</li>
+                      <li>Elaboração e revisão de documentos (Convenção, Regimento).</li>
+                      <li>Assessoria em assembleias.</li>
+                      <li>Resolução de conflitos entre condôminos.</li>
+                      <li>Questões trabalhistas dos funcionários do condomínio.</li>
+                      <li>Defesa do condomínio em ações judiciais.</li>
+                    </ul>
+
+                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Conclusão</h2>
+                    <p>
+                      O Direito Condominial é uma área vital para a saúde e a harmonia de qualquer condomínio.
+                      Compreender suas regras e contar com o apoio jurídico adequado são passos essenciais para uma
+                      gestão eficiente, a prevenção de litígios e a garantia de um ambiente de convivência tranquilo
+                      para todos.
+                    </p>
+                  </div>
+                </FadeIn>
+                <div className="mt-8">
+                  <h3 className="text-xl font-bold text-[#1e2c49] mb-4">Compartilhe este artigo:</h3>
+                  <SocialShare title={articleTitle} url={articleUrl} />
+                </div>
               </div>
 
-              {/* CTA Button */}
-              <div className="mt-12">
-                <CtaButton />
+              <div className="lg:w-1/3">
+                <BlogSidebar />
               </div>
             </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <BlogSidebar />
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <WhatsAppButton />
+      <Footer />
     </div>
   )
 }

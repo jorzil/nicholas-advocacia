@@ -1,159 +1,153 @@
-import Image from "next/image"
 import Link from "next/link"
-import { Calendar, User, Clock, ArrowRight } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Breadcrumb } from "@/components/breadcrumb"
-import { BlogSidebar } from "@/components/blog-sidebar"
-import { calculateReadTime, formatDate, generateExcerpt } from "@/lib/utils"
-
-export const metadata = {
-  title: "Blog - Nicholas Advocacia",
-  description:
-    "Artigos e notícias sobre Direito Imobiliário e Civil para você se manter informado e proteger seus direitos.",
-  keywords: "blog jurídico, direito imobiliário, artigos, notícias, usucapião, contratos, regularização de imóveis",
-  openGraph: {
-    title: "Blog - Nicholas Advocacia",
-    description:
-      "Artigos e notícias sobre Direito Imobiliário e Civil para você se manter informado e proteger seus direitos.",
-    url: "https://www.nicholasadvocacia.com.br/blog",
-  },
-}
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { FadeIn } from "@/components/fade-in"
+import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer"
 
 interface BlogPost {
   id: string
   title: string
+  description: string
+  imageUrl: string
   slug: string
-  content: string
   author: string
-  published_at: string // Changed from publishedAt to published_at to match Supabase schema
-  tags: string[]
-  featured_image: string // Changed from featuredImage to featured_image
-  status: "published" | "draft"
-  excerpt?: string // Make excerpt optional as it can be generated
+  createdAt: string
 }
 
 async function getBlogPosts(): Promise<BlogPost[]> {
-  try {
-    // Fetch from your own API route which now connects to Supabase
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/blog`, {
-      next: { revalidate: 60 }, // Revalidate data every 60 seconds
-    })
-
-    if (!response.ok) {
-      console.error(`Failed to fetch blog posts: HTTP status ${response.status}`)
-      // Fallback to mock data or throw an error
-      return [] // Return empty array on error
-    }
-
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error("Error fetching blog posts:", error)
-    return [] // Return empty array on error
-  }
+  // In a real application, this would fetch from a database or CMS
+  // For now, we'll use static data
+  return [
+    {
+      id: "1",
+      title: "Usucapião Extrajudicial: Como Regularizar Seu Imóvel de Forma Rápida e Segura",
+      description:
+        "Descubra como a usucapião extrajudicial pode ser a solução para regularizar a propriedade do seu imóvel de maneira mais ágil e menos burocrática.",
+      imageUrl: "/blog-usucapiao-extrajudicial.png",
+      slug: "usucapiao-extrajudicial-como-regularizar-imovel",
+      author: "Nicholas Nascimento",
+      createdAt: "2024-07-15",
+    },
+    {
+      id: "2",
+      title: "Documentos Essenciais para Usucapião: Guia Completo para Regularizar Seu Imóvel",
+      description:
+        "Conheça a lista completa de documentos que você precisa para dar entrada no processo de usucapião e garantir a segurança jurídica da sua propriedade.",
+      imageUrl: "/blog-documentos-usucapiao.png",
+      slug: "documentos-essenciais-usucapiao",
+      author: "Nicholas Nascimento",
+      createdAt: "2024-07-10",
+    },
+    {
+      id: "3",
+      title: "Erros Fatais em Contratos Imobiliários: Como Evitá-los e Garantir Sua Segurança",
+      description:
+        "Evite armadilhas comuns em contratos de compra, venda ou locação de imóveis. Saiba quais são os erros mais graves e como se proteger.",
+      imageUrl: "/blog-erros-contratos-imoveis.png",
+      slug: "erros-fatais-contratos-imobiliarios",
+      author: "Nicholas Nascimento",
+      createdAt: "2024-07-05",
+    },
+    {
+      id: "4",
+      title: "O Custo do Adiamento: Por Que Regularizar Seu Imóvel Não Pode Esperar",
+      description:
+        "Descubra os riscos e prejuízos de manter seu imóvel irregular e entenda por que a regularização é um investimento essencial para seu patrimônio.",
+      imageUrl: "/blog-regularizacao-imoveis.png",
+      slug: "regularizacao-imoveis-custo-adiamento",
+      author: "Nicholas Nascimento",
+      createdAt: "2024-06-28",
+    },
+    {
+      id: "5",
+      title: "Direito de Vizinhança: Como Resolver Conflitos e Manter a Harmonia",
+      description:
+        "Conflitos entre vizinhos são comuns, mas podem ser resolvidos de forma amigável ou legal. Entenda seus direitos e deveres para uma boa convivência.",
+      imageUrl: "/blog-direito-vizinhanca.png",
+      slug: "direito-vizinhanca-resolver-conflitos",
+      author: "Nicholas Nascimento",
+      createdAt: "2024-06-20",
+    },
+    {
+      id: "6",
+      title: "Incorporação Imobiliária: Guia Completo para Construtoras e Investidores",
+      description:
+        "Entenda o processo de incorporação imobiliária, desde a aquisição do terreno até a entrega das unidades, e a importância da assessoria jurídica especializada.",
+      imageUrl: "/blog-incorporacao-imobiliaria.png",
+      slug: "incorporacao-imobiliaria-guia-completo",
+      author: "Nicholas Nascimento",
+      createdAt: "2024-06-15",
+    },
+    {
+      id: "7",
+      title: "Direito Condominial: Gestão de Conflitos e Regras Essenciais",
+      description:
+        "Navegue pelas complexidades do direito condominial. Este artigo aborda a gestão de conflitos, as regras essenciais e a importância de uma boa assessoria jurídica para síndicos e moradores.",
+      imageUrl: "/blog-direito-condominial-gestao-conflitos.png",
+      slug: "direito-condominial-gestao-conflitos",
+      author: "Nicholas Nascimento",
+      createdAt: "2024-06-10",
+    },
+  ]
 }
 
 export default async function BlogPage() {
   const blogPosts = await getBlogPosts()
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 min-h-[300px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/law-banner.png" // Placeholder image for blog hero
-            alt="Fundo do blog"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/60"></div>
-        </div>
-        <div className="container relative z-10 mx-auto px-4 lg:px-6 text-white">
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Blog", href: "/blog" },
-            ]}
-          />
-          <h1 className="mt-6 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">Nosso Blog</h1>
-          <p className="mt-4 text-xl text-gray-200 max-w-3xl">
-            Artigos e notícias sobre Direito Imobiliário e Civil para você se manter informado.
-          </p>
-        </div>
-      </section>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-r from-[#1e2c49] to-[#2a3c5e] text-white">
+          <div className="container px-4 md:px-6 text-center">
+            <FadeIn>
+              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">Nosso Blog</h1>
+              <p className="mx-auto max-w-[700px] text-gray-200 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
+                Fique por dentro das últimas notícias e análises sobre direito imobiliário e digital.
+              </p>
+            </FadeIn>
+          </div>
+        </section>
 
-      {/* Main Content Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            {/* Blog Posts Grid */}
-            <div className="lg:col-span-3">
-              <div className="grid gap-8 md:grid-cols-2">
-                {blogPosts
-                  .filter((post) => post.status === "published")
-                  .map((post) => (
-                    <Card
-                      key={post.id}
-                      className="flex h-full flex-col overflow-hidden border-none shadow-lg transition-all hover:shadow-xl"
-                    >
-                      <div className="relative h-48 w-full">
-                        <Image
-                          src={post.featured_image || "/placeholder.svg"}
-                          alt={post.title}
-                          fill
-                          className="object-cover"
-                        />
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {blogPosts.map((post, index) => (
+                <FadeIn key={post.id} delay={0.1 * index}>
+                  <Card className="flex flex-col h-full overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="relative w-full h-48">
+                      <Image
+                        src={post.imageUrl || "/placeholder.svg"}
+                        alt={post.title}
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-t-lg"
+                      />
+                    </div>
+                    <CardHeader className="flex-grow">
+                      <CardTitle className="text-xl font-bold text-[#1e2c49]">{post.title}</CardTitle>
+                      <CardDescription className="text-gray-600 mt-2">{post.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-0">
+                      <div className="text-sm text-gray-500 mb-4">
+                        Por {post.author} em {new Date(post.createdAt).toLocaleDateString("pt-BR")}
                       </div>
-                      <CardContent className="flex flex-grow flex-col p-6">
-                        <div className="mb-4 flex items-center gap-4 text-sm text-gray-500">
-                          <div className="flex items-center">
-                            <Calendar className="mr-1 h-4 w-4" />
-                            <span>{formatDate(post.published_at)}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <User className="mr-1 h-4 w-4" />
-                            <span>{post.author}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="mr-1 h-4 w-4" />
-                            <span>{calculateReadTime(post.content)}</span>
-                          </div>
-                        </div>
-                        <h3 className="mb-2 text-xl font-bold text-[#1e2c49] line-clamp-2">{post.title}</h3>
-                        <p className="mb-4 flex-grow text-gray-600 line-clamp-3">
-                          {post.excerpt || generateExcerpt(post.content)}
-                        </p>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {post.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                        <Button asChild variant="link" className="p-0 text-[#d4b26a] hover:text-[#c4a25a]">
-                          <Link href={`/blog/${post.slug}`} className="flex items-center">
-                            Ler mais <ArrowRight className="ml-2 h-4 w-4" />
-                          </Link>
+                      <Link href={`/blog/${post.slug}`} passHref>
+                        <Button className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c0a05e] transition-colors">
+                          Leia Mais
                         </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <BlogSidebar posts={blogPosts.filter((post) => post.status === "published")} />
+                      </Link>
+                    </CardContent>
+                  </Card>
+                </FadeIn>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <WhatsAppButton />
+      <Footer />
     </div>
   )
 }

@@ -1,42 +1,44 @@
 "use client"
 
-import type React from "react"
-
 import { useEffect } from "react"
-import { usePathname } from "next/navigation"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { WhatsAppButton } from "@/components/whatsapp-button"
 
-export default function ClientComponents({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const pathname = usePathname()
-
-  // Função para enviar eventos para o Google Analytics
-  const sendPageView = (url: string) => {
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      ;(window as any).gtag("config", process.env.NEXT_PUBLIC_GA_ID, {
-        page_path: url,
-      })
-    }
-  }
-
+export function ClientComponents() {
   useEffect(() => {
-    // Envia pageview quando a rota muda
-    sendPageView(pathname)
-  }, [pathname])
+    const removeV0Attribution = () => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList" || mutation.type === "subtree") {
+            const v0Element = document.querySelector('a[href*="v0.dev"]')
+            if (v0Element) {
+              v0Element.remove()
+              observer.disconnect() // Stop observing once removed
+              console.log("Removed 'Built with V0' attribution.")
+            }
+          }
+        })
+      })
 
-  const isAdminRoute = pathname.startsWith("/admin")
+      // Start observing the body for changes
+      observer.observe(document.body, { childList: true, subtree: true })
 
-  return (
-    <>
-      {!isAdminRoute && <Navbar />}
-      <main className={!isAdminRoute ? "pt-[72px]" : ""}>{children}</main>
-      {!isAdminRoute && <Footer />}
-      {!isAdminRoute && <WhatsAppButton />}
-    </>
-  )
+      // Also try to remove it immediately in case it's already there
+      const v0Element = document.querySelector('a[href*="v0.dev"]')
+      if (v0Element) {
+        v0Element.remove()
+        console.log("Removed 'Built with V0' attribution on initial load.")
+        observer.disconnect()
+      }
+    }
+
+    // Run the removal logic
+    removeV0Attribution()
+
+    // Clean up observer on component unmount
+    return () => {
+      // No need to disconnect if already disconnected, but good practice
+      // If you re-enable observer, ensure it's disconnected here
+    }
+  }, [])
+
+  return null // This component doesn't render anything visible
 }

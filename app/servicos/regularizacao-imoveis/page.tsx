@@ -1,169 +1,147 @@
 import Image from "next/image"
-import Link from "next/link"
-import { CheckCircle, Phone } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ContactForm } from "@/components/contact-form" // Reusing general contact form
-import { FadeIn } from "@/components/fade-in"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Breadcrumb } from "@/components/breadcrumb"
 import { ServiceSidebar } from "@/components/service-sidebar"
-import { ChevronRight } from "lucide-react" // Declaring the variable before using it
-
-export const metadata = {
-  title: "Regularização de Imóveis - Nicholas Advocacia",
-  description: "Serviços de regularização de imóveis para garantir a legalidade e valorização do seu patrimônio.",
-  keywords:
-    "regularização de imóveis, imóvel irregular, escritura, registro de imóveis, direito imobiliário, advogado imobiliário",
-  openGraph: {
-    title: "Regularização de Imóveis - Nicholas Advocacia",
-    description: "Serviços de regularização de imóveis para garantir a legalidade e valorização do seu patrimônio.",
-    url: "https://www.nicholasadvocacia.com.br/servicos/regularizacao-imoveis",
-  },
-}
+import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer"
+import { SchedulingForm } from "@/components/scheduling-form"
+import { FadeIn } from "@/components/fade-in"
 
 export default function RegularizacaoImoveisPage() {
+  const breadcrumbItems = [
+    { label: "Serviços", href: "/servicos" },
+    { label: "Regularização de Imóveis", href: "/servicos/regularizacao-imoveis" },
+  ]
+
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 min-h-[400px] flex items-center">
-        <div className="container relative z-10 mx-auto px-4 lg:px-6">
-          <div className="max-w-4xl">
-            <FadeIn direction="up" delay={0.2} className="space-y-6 text-left">
-              <div>
-                <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
-                  Regularização de Imóveis
-                </h1>
-                <p className="text-xl text-gray-200 mb-6 max-w-3xl">
-                  Transforme seu imóvel irregular em um bem legalizado e valorizado.
-                </p>
-                <Button size="lg" className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
-                  <Link
-                    href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20regularização%20de%20imóveis!"
-                    className="flex items-center gap-2"
-                  >
-                    Falar com Especialista
-                    <ChevronRight className="h-5 w-5" />
-                  </Link>
-                </Button>
-              </div>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <section
+          className="relative w-full h-[400px] bg-cover bg-center"
+          style={{ backgroundImage: "url('/law-office-background.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <FadeIn>
+              <h1 className="text-5xl font-bold text-white text-center">Regularização de Imóveis</h1>
             </FadeIn>
           </div>
-        </div>
+        </section>
 
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/property-document-checkmark.png" // Placeholder image
-            alt="Fundo de regularização de imóveis"
-            fill
-            className="object-cover"
-            priority
-          />
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/50"></div>
-        </div>
-      </section>
+        <section className="py-12 md:py-20 bg-gray-50">
+          <div className="container px-4 md:px-6">
+            <Breadcrumb items={breadcrumbItems} />
+            <div className="flex flex-col lg:flex-row gap-12 mt-8">
+              <div className="lg:w-2/3 space-y-8">
+                <FadeIn>
+                  <h2 className="text-3xl font-bold text-[#1e2c49]">Por que regularizar seu imóvel?</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    A regularização de imóveis é um processo fundamental para garantir a segurança jurídica da sua
+                    propriedade. Um imóvel irregular pode gerar diversos problemas, como dificuldades na venda,
+                    impossibilidade de financiamento, multas e até mesmo a perda da propriedade. Nosso escritório
+                    oferece soluções completas para regularizar seu imóvel, seja ele residencial, comercial ou rural.
+                  </p>
+                  <Image
+                    src="/property-document-checkmark.png"
+                    alt="Documento de propriedade com checkmark"
+                    width={800}
+                    height={450}
+                    className="rounded-lg shadow-md mt-6"
+                  />
+                </FadeIn>
 
-      {/* Main Content Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <ServiceSidebar />
-            </div>
+                <FadeIn delay={0.2}>
+                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Nossos Serviços de Regularização</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    Atuamos em diversas frentes para garantir a completa regularização do seu imóvel:
+                  </p>
+                  <Accordion type="single" collapsible className="w-full mt-6">
+                    <AccordionItem value="item-1">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Análise Documental e Diagnóstico
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Realizamos um levantamento completo da situação jurídica e documental do imóvel, identificando
+                        pendências e irregularidades.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Retificação de Registro Imobiliário
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Correção de erros ou omissões na matrícula do imóvel, como medidas, confrontações ou descrições.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-3">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Averbação de Construção/Demolição
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Registro de construções, reformas ou demolições realizadas no imóvel junto ao Cartório de
+                        Registro de Imóveis.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-4">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Desmembramento e Remembramento
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Divisão de um terreno em lotes menores (desmembramento) ou união de lotes (remembramento).
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-5">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Instituição de Condomínio
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Processo legal para transformar um edifício ou conjunto de casas em condomínio.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-6">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Obtenção de Certidões
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Auxílio na obtenção de todas as certidões necessárias para a regularização, como certidões
+                        negativas de débitos, IPTU, etc.
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </FadeIn>
 
-            {/* Content */}
-            <div className="lg:col-span-3">
-              <article className="prose prose-lg max-w-none text-gray-700">
-                <h2>Por que Regularizar seu Imóvel?</h2>
-                <p>
-                  A regularização de um imóvel é fundamental para garantir a segurança jurídica do seu patrimônio. Um
-                  imóvel irregular pode trazer diversos problemas, como dificuldade para vender, alugar, obter
-                  financiamentos, e até mesmo multas e desapropriações. A regularização valoriza o bem e permite que
-                  você exerça plenamente seus direitos de propriedade.
-                </p>
+                <FadeIn delay={0.3}>
+                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Benefícios da Regularização</h2>
+                  <ul className="list-disc list-inside text-lg text-gray-700 space-y-2 mt-4">
+                    <li>Aumento do valor de mercado do imóvel.</li>
+                    <li>Facilidade na venda e compra, com acesso a financiamentos.</li>
+                    <li>Segurança jurídica para o proprietário.</li>
+                    <li>Evita multas e sanções administrativas.</li>
+                    <li>Possibilita a realização de reformas e ampliações de forma legal.</li>
+                    <li>Garante a transmissão do imóvel para herdeiros sem complicações.</li>
+                  </ul>
+                </FadeIn>
 
-                <h2>Principais Situações de Irregularidade</h2>
-                <p>As irregularidades mais comuns incluem:</p>
-                <ul>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Imóveis sem escritura ou registro.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Construções ou reformas sem alvará ou habite-se.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Diferenças entre a área construída real e a registrada.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Imóveis com dívidas de IPTU ou outras taxas.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Heranças não formalizadas (inventário).
-                  </li>
-                </ul>
+                <FadeIn delay={0.4}>
+                  <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                    <h2 className="text-3xl font-bold text-[#1e2c49] mb-6 text-center">Agende Sua Consulta</h2>
+                    <p className="text-lg text-gray-700 mb-6 text-center">
+                      Não deixe seu imóvel em situação irregular. Entre em contato e garanta a segurança do seu
+                      patrimônio.
+                    </p>
+                    <SchedulingForm />
+                  </div>
+                </FadeIn>
+              </div>
 
-                <h2>Como a Nicholas Advocacia Pode Ajudar?</h2>
-                <p>
-                  Nosso escritório oferece assessoria completa para a regularização de imóveis, atuando em todas as
-                  etapas do processo:
-                </p>
-                <ul>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Análise da situação jurídica do imóvel e identificação das irregularidades.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Levantamento e organização da documentação necessária.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Representação junto a cartórios, prefeituras e demais órgãos.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Acompanhamento de processos de usucapião, inventário, retificação de área, etc.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Obtenção de certidões e alvarás.
-                  </li>
-                </ul>
-
-                <p>
-                  Com nossa expertise, você terá a tranquilidade de saber que seu imóvel estará totalmente legalizado,
-                  livre de problemas e com seu valor de mercado garantido.
-                </p>
-
-                <div className="mt-8 text-center">
-                  <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
-                    <Link
-                      href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20regularização%20de%20imóveis!"
-                      className="flex items-center gap-2"
-                    >
-                      <Phone className="h-5 w-5" />
-                      Falar com Especialista
-                    </Link>
-                  </Button>
-                </div>
-              </article>
-
-              {/* Contact Form Section */}
-              <div className="mt-16 p-6 bg-gray-50 rounded-lg shadow-md">
-                <h2 className="text-3xl font-bold text-[#1e2c49] mb-8 text-center">
-                  Solicite um Orçamento para Regularização do seu Imóvel
-                </h2>
-                <ContactForm />
+              <div className="lg:w-1/3">
+                <ServiceSidebar />
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <WhatsAppButton />
+      <Footer />
     </div>
   )
 }

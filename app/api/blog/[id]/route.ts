@@ -1,28 +1,64 @@
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase" // Import the server-side Supabase client
+import { createClient } from "@supabase/supabase-js"
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
+  throw new Error("Missing Supabase environment variables")
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const { id } = params
-  try {
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select("*")
-      .eq("slug", id) // Assuming 'id' here is actually the slug for public view
-      .eq("status", "published") // Only fetch published posts for public view
-      .single()
 
-    if (error) {
-      if (error.code === "PGRST116") {
-        // No rows found
-        return NextResponse.json({ message: "Post not found or not published" }, { status: 404 })
-      }
-      console.error(`Error fetching public blog post ${id} from Supabase:`, error)
-      return NextResponse.json({ message: "Failed to fetch blog post", error: error.message }, { status: 500 })
-    }
+  const { data, error } = await supabase.from("blog_posts").select("*").eq("id", id).single()
 
-    return NextResponse.json(data)
-  } catch (e: any) {
-    console.error(`Unexpected error in GET /api/blog/${id}:`, e)
-    return NextResponse.json({ message: "Internal server error", error: e.message }, { status: 500 })
+  if (error) {
+    console.error(`Error fetching blog post with ID ${id}:`, error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  if (!data) {
+    return NextResponse.json({ error: "Blog post not found" }, { status: 404 })
+  }
+
+  return NextResponse.json(data)
+}
+
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  const { id } = params
+  const { title, content, imageUrl, author, tags, slug, description } = await request.json()
+
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .update({ title, content, image_url: imageUrl, author, tags, slug, description })
+    .eq("id", id)
+    .select()
+
+  if (error) {
+    console.error(`Error updating blog post with ID ${id}:`, error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  if (!data || data.length === 0) {
+    return NextResponse.json({ error: "Blog post not found or no changes made" }, { status: 404 })
+  }
+
+  return NextResponse.json(data[0])
+}
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const { id } = params
+
+  const { error } = await supabase.from("blog_posts").delete().eq("id", id)
+
+  if (error) {
+    console.error(`Error deleting blog post with ID ${id}:`, error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ message: "Blog post deleted successfully" }, { status: 200 })
 }

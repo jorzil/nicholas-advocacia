@@ -1,110 +1,77 @@
-"use client"
-
 import Link from "next/link"
-import { MapPin, Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react"
 import Image from "next/image"
+import { Facebook, Instagram, Linkedin, MapPin, Phone, Mail } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300 py-12 px-4 md:px-6">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-[#1e2c49] text-white py-8 md:py-12">
+      <div className="container mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Coluna 1: Logo e Informações de Contato */}
         <div className="space-y-4">
-          <Link className="flex items-center gap-2" href="/">
-            <Image src="/logo-nicholas-nascimento.png" alt="Nicholas Advocacia Logo" width={150} height={40} priority />
-            <span className="sr-only">Nicholas Advocacia</span>
+          <Link href="/" className="flex items-center gap-2" prefetch={false}>
+            <Image
+              src="/logo-nicholas-nascimento.png"
+              alt="Nicholas Nascimento Advocacia"
+              width={180}
+              height={40}
+              className="h-10 w-auto"
+            />
+            <span className="sr-only">Nicholas Nascimento Advocacia</span>
           </Link>
-          <p className="text-sm">
-            Especialistas em Direito Imobiliário, oferecendo soluções jurídicas personalizadas e eficientes para
-            proteger seu patrimônio.
-          </p>
+          <div className="flex items-center space-x-2">
+            <MapPin className="h-5 w-5 text-[#d4b26a]" />
+            <p className="text-sm">Rua Exemplo, 123, Centro, Cidade - SP</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Phone className="h-5 w-5 text-[#d4b26a]" />
+            <p className="text-sm">(11) 99999-9999</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Mail className="h-5 w-5 text-[#d4b26a]" />
+            <p className="text-sm">contato@nicholasnascimento.adv.br</p>
+          </div>
         </div>
+
+        {/* Coluna 2: Navegação */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Links Rápidos</h3>
-          <nav className="space-y-2">
-            <Link className="block text-sm hover:text-white transition-colors" href="/">
+          <h3 className="text-xl font-bold text-[#d4b26a]">Navegação</h3>
+          <nav className="flex flex-col space-y-2">
+            <Link href="/" className="text-sm hover:text-[#d4b26a] transition-colors">
               Início
             </Link>
-            <Link className="block text-sm hover:text-white transition-colors" href="/sobre">
-              Sobre
+            <Link href="/sobre" className="text-sm hover:text-[#d4b26a] transition-colors">
+              Sobre Nós
             </Link>
-            <Link className="block text-sm hover:text-white transition-colors" href="/servicos">
+            <Link href="/servicos" className="text-sm hover:text-[#d4b26a] transition-colors">
               Serviços
             </Link>
-            <Link className="block text-sm hover:text-white transition-colors" href="/blog">
+            <Link href="/blog" className="text-sm hover:text-[#d4b26a] transition-colors">
               Blog
             </Link>
-            <Link className="block text-sm hover:text-white transition-colors" href="/contato">
+            <Link href="/contato" className="text-sm hover:text-[#d4b26a] transition-colors">
               Contato
             </Link>
           </nav>
         </div>
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Serviços</h3>
-          <nav className="space-y-2">
-            <Link className="block text-sm hover:text-white transition-colors" href="/servicos/usucapiao">
-              Usucapião
-            </Link>
-            <Link className="block text-sm hover:text-white transition-colors" href="/servicos/regularizacao-imoveis">
-              Regularização de Imóveis
-            </Link>
-            <Link className="block text-sm hover:text-white transition-colors" href="/servicos/contratos-imobiliarios">
-              Contratos Imobiliários
-            </Link>
-            <Link className="block text-sm hover:text-white transition-colors" href="/servicos/litigios-imobiliarios">
-              Litígios Imobiliários
-            </Link>
-            <Link
-              className="block text-sm hover:text-white transition-colors"
-              href="/servicos/incorporacao-imobiliaria"
-            >
-              Incorporação Imobiliária
-            </Link>
-            <Link className="block text-sm hover:text-white transition-colors" href="/servicos/direito-condominial">
-              Direito Condominial
-            </Link>
-            <Link
-              className="block text-sm hover:text-white transition-colors"
-              href="/servicos/recuperacao-conta-mercado-livre"
-            >
-              Recuperação de Conta Mercado Livre
-            </Link>
-          </nav>
-        </div>
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Contato</h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary-foreground" />
-              <p className="text-sm">Rua Boa Vista, 123, Centro, Arapiraca - AL</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone className="h-5 w-5 text-primary-foreground" />
-              <a className="text-sm hover:text-white transition-colors" href="tel:+5582999999999">
-                (82) 99999-9999
-              </a>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-primary-foreground" />
-              <a className="text-sm hover:text-white transition-colors" href="mailto:contato@nicholasadvocacia.com.br">
-                contato@nicholasadvocacia.com.br
-              </a>
-            </div>
+
+        {/* Coluna 3: Redes Sociais e Copyright */}
+        <div className="space-y-4 text-center md:text-right">
+          <h3 className="text-xl font-bold text-[#d4b26a]">Siga-nos</h3>
+          <div className="flex justify-center md:justify-end space-x-4 mt-2">
+            <a href="#" aria-label="Facebook" className="text-white hover:text-[#d4b26a] transition-colors">
+              <Facebook className="h-6 w-6" />
+            </a>
+            <a href="#" aria-label="Instagram" className="text-white hover:text-[#d4b26a] transition-colors">
+              <Instagram className="h-6 w-6" />
+            </a>
+            <a href="#" aria-label="LinkedIn" className="text-white hover:text-[#d4b26a] transition-colors">
+              <Linkedin className="h-6 w-6" />
+            </a>
           </div>
-          <div className="flex gap-4 pt-4">
-            <Link aria-label="Facebook" href="#">
-              <Facebook className="h-6 w-6 hover:text-white transition-colors" />
-            </Link>
-            <Link aria-label="Instagram" href="#">
-              <Instagram className="h-6 w-6 hover:text-white transition-colors" />
-            </Link>
-            <Link aria-label="LinkedIn" href="#">
-              <Linkedin className="h-6 w-6 hover:text-white transition-colors" />
-            </Link>
-          </div>
+          <p className="text-xs text-gray-400 mt-6">
+            &copy; {new Date().getFullYear()} Nicholas Nascimento Advocacia. Todos os direitos reservados.
+          </p>
         </div>
-      </div>
-      <div className="mt-8 border-t border-gray-700 pt-8 text-center text-sm">
-        © {new Date().getFullYear()} Nicholas Advocacia. Todos os direitos reservados.
       </div>
     </footer>
   )

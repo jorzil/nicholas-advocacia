@@ -1,18 +1,8 @@
 import { BlogPostForm } from "@/components/blog-post-form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { ChevronLeft } from "lucide-react"
 import { notFound } from "next/navigation"
-
-interface BlogPost {
-  id: string
-  title: string
-  slug: string
-  content: string
-  author: string
-  publishedAt: string
-  status: "published" | "draft"
-  tags: string[]
-  featuredImage?: string
-}
 
 interface EditBlogPostPageProps {
   params: {
@@ -20,56 +10,48 @@ interface EditBlogPostPageProps {
   }
 }
 
-export default async function EditBlogPostPage({ params }: EditBlogPostPageProps) {
-  const { id } = params
-
-  let post: BlogPost | null = null
-  let error: string | null = null
-
+async function getBlogPost(id: string) {
   try {
-    // Use NEXT_PUBLIC_APP_URL para garantir que a chamada funcione em produção
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog/${id}`, {
-      cache: "no-store", // Ensure fresh data on every request
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog/${id}`, {
+      cache: "no-store", // Ensure fresh data
     })
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        notFound() // Trigger Next.js not-found page
-      }
-      const errorText = await response.text()
-      console.error(`Failed to fetch post ${id}: HTTP status ${response.status}, response: ${errorText}`)
-      throw new Error(`Failed to fetch post: ${response.statusText}`)
+    if (res.status === 404) {
+      notFound()
     }
 
-    post = await response.json()
-  } catch (e: any) {
-    console.error("Error fetching post for edit:", e)
-    error = `Não foi possível carregar o post: ${e.message}`
-  }
+    if (!res.ok) {
+      console.error(`Failed to fetch blog post: ${res.status} ${res.statusText}`)
+      throw new Error("Failed to fetch blog post")
+    }
 
-  if (error) {
-    return (
-      <div className="container mx-auto p-6 text-red-600">
-        <h1 className="text-2xl font-bold mb-4">Erro ao Carregar Post</h1>
-        <p>{error}</p>
-      </div>
-    )
+    const data = await res.json()
+    return data
+  } catch (error) {
+    console.error("Error fetching blog post:", error)
+    notFound() // Treat any fetch error as not found for simplicity
   }
+}
 
-  if (!post) {
-    notFound() // Should not happen if error is handled, but as a fallback
+export default async function EditBlogPostPage({ params }: EditBlogPostPageProps) {
+  const blogPost = await getBlogPost(params.id)
+
+  if (!blogPost) {
+    notFound()
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Editar Post</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <BlogPostForm initialData={post} />
-        </CardContent>
-      </Card>
+    <div className="flex flex-col min-h-screen bg-gray-100 p-4 md:p-8">
+      <div className="flex items-center gap-4 mb-6">
+        <Link href="/admin/blog">
+          <Button variant="outline" size="icon">
+            <ChevronLeft className="h-4 w-4" />
+            <span className="sr-only">Voltar</span>
+          </Button>
+        </Link>
+        <h1 className="text-3xl font-bold text-[#1e2c49]">Editar Postagem</h1>
+      </div>
+      <BlogPostForm initialData={blogPost} />
     </div>
   )
 }

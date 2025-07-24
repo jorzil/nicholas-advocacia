@@ -1,146 +1,144 @@
-import Image from "next/image"
-import { Calendar, User, Clock } from "lucide-react"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { SocialShare } from "@/components/social-share"
-import { CtaButton } from "@/components/cta-button"
 import { BlogSidebar } from "@/components/blog-sidebar"
-import { calculateReadTime, formatDate } from "@/lib/utils"
+import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer"
+import { FadeIn } from "@/components/fade-in"
 
-export const metadata = {
-  title: "Regularização de Imóveis: O Custo de Adiar - Nicholas Advocacia",
-  description:
-    "Descubra os riscos e custos de manter um imóvel irregular e por que a regularização é um investimento essencial.",
-  keywords: "regularização de imóveis, imóvel irregular, custos, riscos, advogado imobiliário, valorização do imóvel",
-  openGraph: {
-    title: "Regularização de Imóveis: O Custo de Adiar - Nicholas Advocacia",
-    description:
-      "Descubra os riscos e custos de manter um imóvel irregular e por que a regularização é um investimento essencial.",
-    url: "https://www.nicholasadvocacia.com.br/blog/regularizacao-imoveis-custo-adiamento",
-    images: ["/blog-regularizacao-imoveis.png"],
-  },
-}
+export default function RegularizacaoImoveisCustoAdiamentoPage() {
+  const breadcrumbItems = [
+    { label: "Blog", href: "/blog" },
+    { label: "Custo do Adiamento da Regularização de Imóveis", href: "/blog/regularizacao-imoveis-custo-adiamento" },
+  ]
 
-export default function BlogPostPage() {
-  const post = {
-    title: "Regularização de Imóveis: O Custo de Adiar",
-    author: "Nicholas Nascimento",
-    publishedAt: "2023-03-01T10:00:00Z",
-    featuredImage: "/blog-regularizacao-imoveis.png",
-    content: `
-      <h2>Introdução</h2>
-      <p>Muitos proprietários adiam a regularização de seus imóveis por diversos motivos, seja por desconhecimento, burocracia ou custos iniciais. No entanto, manter um imóvel irregular pode gerar problemas muito maiores e mais caros no futuro. Entender o custo de adiar é crucial para tomar a decisão certa.</p>
-
-      <h2>O que é um Imóvel Irregular?</h2>
-      <p>Um imóvel é considerado irregular quando sua situação fática (o que existe na realidade) não corresponde à sua situação jurídica (o que está registrado nos órgãos competentes, como prefeitura e cartório de imóveis). Isso pode incluir construções sem alvará, reformas não averbadas, falta de escritura, ou problemas na cadeia de propriedade.</p>
-
-      <h2>Os Riscos e Custos de Manter um Imóvel Irregular</h2>
-      <h3>1. Dificuldade na Venda e Perda de Valor</h3>
-      <p>Um imóvel irregular é muito mais difícil de ser vendido. Compradores que dependem de financiamento bancário não conseguirão aprovação, e mesmo compradores à vista exigirão uma grande desvalorização para assumir o risco da regularização. Você pode perder oportunidades de negócio e ter seu patrimônio desvalorizado.</p>
-
-      <h3>2. Impossibilidade de Financiamento e Uso como Garantia</h3>
-      <p>Bancos e instituições financeiras não aceitam imóveis irregulares como garantia para empréstimos ou financiamentos. Isso limita seu acesso a crédito e impede que você utilize seu patrimônio como alavanca financeira para outros investimentos ou necessidades.</p>
-
-      <h3>3. Multas e Fiscalização</h3>
-      <p>Prefeituras e outros órgãos fiscalizadores podem aplicar multas pesadas por irregularidades, como construções sem licença ou falta de habite-se. Em casos extremos, o imóvel pode ser embargado ou até mesmo demolido, gerando prejuízos incalculáveis.</p>
-
-      <h3>4. Problemas em Inventários e Heranças</h3>
-      <p>A partilha de um imóvel irregular em um inventário é um processo complicado e demorado. A falta de documentação adequada pode atrasar a conclusão do inventário e gerar custos adicionais para os herdeiros, que terão que arcar com a regularização antes de finalizar a partilha.</p>
-
-      <h3>5. Insegurança Jurídica</h3>
-      <p>Sem a documentação em dia, você não tem a plena segurança jurídica sobre sua propriedade. Isso significa que seu direito pode ser contestado por terceiros, e você terá mais dificuldade em se defender em caso de litígios.</p>
-
-      <h2>A Regularização como Investimento</h2>
-      <p>Embora a regularização envolva custos iniciais (taxas, impostos, honorários advocatícios), ela deve ser vista como um investimento. Um imóvel regularizado:</p>
-      <ul>
-        <li>Aumenta seu valor de mercado.</li>
-        <li>Facilita a venda e o financiamento.</li>
-        <li>Evita multas e problemas com a fiscalização.</li>
-        <li>Garante a segurança jurídica da sua propriedade.</li>
-        <li>Simplifica processos de herança e sucessão.</li>
-      </ul>
-
-      <h2>Conclusão</h2>
-      <p>Adiar a regularização do seu imóvel é adiar a solução de problemas que só tendem a se agravar. Não espere que a situação se torne insustentável. Procure um advogado especialista em Direito Imobiliário para analisar seu caso e iniciar o processo de regularização o quanto antes. É um passo fundamental para proteger seu patrimônio e garantir sua tranquilidade.</p>
-    `,
-  }
-
-  const readTime = calculateReadTime(post.content)
+  const articleTitle = "O Custo do Adiamento: Por Que Regularizar Seu Imóvel Não Pode Esperar"
+  const articleUrl = `${process.env.NEXT_PUBLIC_APP_URL}/blog/regularizacao-imoveis-custo-adiamento`
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 min-h-[300px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={post.featuredImage || "/placeholder.svg"}
-            alt={post.title}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/60"></div>
-        </div>
-        <div className="container relative z-10 mx-auto px-4 lg:px-6 text-white">
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Blog", href: "/blog" },
-              {
-                label: "Regularização de Imóveis: O Custo de Adiar",
-                href: "/blog/regularizacao-imoveis-custo-adiamento",
-              },
-            ]}
-          />
-          <h1 className="mt-6 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">{post.title}</h1>
-          <div className="mt-4 flex items-center gap-4 text-lg text-gray-200">
-            <div className="flex items-center">
-              <User className="mr-2 h-5 w-5" />
-              <span>{post.author}</span>
-            </div>
-            <div className="flex items-center">
-              <Calendar className="mr-2 h-5 w-5" />
-              <span>{formatDate(post.publishedAt)}</span>
-            </div>
-            <div className="flex items-center">
-              <Clock className="mr-2 h-5 w-5" />
-              <span>{readTime}</span>
-            </div>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <section
+          className="relative w-full h-[300px] bg-cover bg-center"
+          style={{ backgroundImage: "url('/blog-regularizacao-imoveis.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <FadeIn>
+              <h1 className="text-4xl font-bold text-white text-center px-4">{articleTitle}</h1>
+            </FadeIn>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Main Content Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            {/* Blog Post Content */}
-            <div className="lg:col-span-3">
-              <article className="prose prose-lg max-w-none text-gray-700">
-                <div dangerouslySetInnerHTML={{ __html: post.content }} />
-              </article>
+        <section className="py-8 md:py-12 bg-gray-50">
+          <div className="container px-4 md:px-6">
+            <Breadcrumb items={breadcrumbItems} />
+            <div className="flex flex-col lg:flex-row gap-12 mt-8">
+              <div className="lg:w-2/3 space-y-8">
+                <FadeIn>
+                  <div className="prose prose-lg max-w-none text-gray-700">
+                    <p>
+                      Muitos proprietários adiam a regularização de seus imóveis por considerarem o processo burocrático
+                      ou caro. No entanto, a verdade é que a irregularidade de um bem pode gerar custos muito maiores e
+                      problemas complexos no futuro. Entender os riscos e as vantagens da regularização é o primeiro
+                      passo para proteger seu patrimônio.
+                    </p>
 
-              {/* Share Buttons */}
-              <div className="mt-12 border-t border-gray-200 pt-8">
-                <h3 className="text-xl font-bold text-[#1e2c49] mb-4">Compartilhe este artigo:</h3>
-                <SocialShare
-                  title={post.title}
-                  url={`https://www.nicholasadvocacia.com.br/blog/${post.title.toLowerCase().replace(/\s+/g, "-")}`}
-                />
+                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Os Riscos de um Imóvel Irregular</h2>
+                    <p>
+                      Um imóvel sem a devida regularização no Cartório de Registro de Imóveis ou na prefeitura pode
+                      trazer uma série de dores de cabeça:
+                    </p>
+                    <ul className="list-disc list-inside">
+                      <li>
+                        <strong>Dificuldade na Venda:</strong> Imóveis irregulares são de difícil comercialização, pois
+                        bancos não aprovam financiamentos e compradores se sentem inseguros. Isso pode desvalorizar o
+                        bem em até 30%.
+                      </li>
+                      <li>
+                        <strong>Impossibilidade de Financiamento:</strong> Sem a documentação em dia, você não consegue
+                        usar o imóvel como garantia para empréstimos ou financiamentos.
+                      </li>
+                      <li>
+                        <strong>Multas e Fiscalizações:</strong> Construções não averbadas ou alterações sem licença
+                        podem gerar multas pesadas por parte da prefeitura.
+                      </li>
+                      <li>
+                        <strong>Perda da Propriedade:</strong> Em casos extremos, a falta de regularização pode levar à
+                        perda do imóvel, especialmente em situações de usucapião por terceiros.
+                      </li>
+                      <li>
+                        <strong>Problemas na Herança:</strong> A transmissão de um imóvel irregular para herdeiros é
+                        mais complexa e cara, podendo gerar disputas familiares.
+                      </li>
+                      <li>
+                        <strong>Valorização Limitada:</strong> Um imóvel regularizado tende a se valorizar mais no
+                        mercado, pois oferece segurança e liquidez.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Benefícios da Regularização</h2>
+                    <p>Regularizar seu imóvel é um investimento que traz inúmeros benefícios:</p>
+                    <ul className="list-disc list-inside">
+                      <li>
+                        <strong>Segurança Jurídica:</strong> Você se torna o legítimo proprietário, com todos os
+                        direitos garantidos por lei.
+                      </li>
+                      <li>
+                        <strong>Valorização do Patrimônio:</strong> Imóveis regularizados são mais valorizados e atraem
+                        mais compradores.
+                      </li>
+                      <li>
+                        <strong>Acesso a Crédito:</strong> Possibilidade de usar o imóvel como garantia em operações
+                        financeiras.
+                      </li>
+                      <li>
+                        <strong>Tranquilidade na Transmissão:</strong> Facilidade na venda, doação ou herança do bem.
+                      </li>
+                      <li>
+                        <strong>Evita Problemas Futuros:</strong> Previne multas, fiscalizações e litígios.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Como Iniciar a Regularização?</h2>
+                    <p>
+                      O processo de regularização pode variar dependendo da situação do imóvel (falta de escritura,
+                      construção não averbada, etc.). Geralmente, envolve:
+                    </p>
+                    <ol className="list-decimal list-inside">
+                      <li>Levantamento e análise da documentação existente.</li>
+                      <li>Identificação das pendências (cartorárias, fiscais, urbanísticas).</li>
+                      <li>Elaboração de projetos e laudos técnicos (se necessário).</li>
+                      <li>Pagamento de taxas e impostos.</li>
+                      <li>Registro e averbação nos órgãos competentes.</li>
+                    </ol>
+                    <p>
+                      A assessoria de um advogado especialista em direito imobiliário é fundamental para conduzir o
+                      processo de forma eficiente e segura, evitando erros e agilizando a regularização.
+                    </p>
+
+                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Conclusão</h2>
+                    <p>
+                      Adiar a regularização do seu imóvel é, na verdade, acumular problemas e custos futuros. Proteger
+                      seu patrimônio significa garantir que ele esteja em conformidade com a lei. Não espere que a
+                      irregularidade se torne um obstáculo intransponível. Invista na segurança jurídica do seu bem hoje
+                      mesmo.
+                    </p>
+                  </div>
+                </FadeIn>
+                <div className="mt-8">
+                  <h3 className="text-xl font-bold text-[#1e2c49] mb-4">Compartilhe este artigo:</h3>
+                  <SocialShare title={articleTitle} url={articleUrl} />
+                </div>
               </div>
 
-              {/* CTA Button */}
-              <div className="mt-12">
-                <CtaButton />
+              <div className="lg:w-1/3">
+                <BlogSidebar />
               </div>
             </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <BlogSidebar />
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <WhatsAppButton />
+      <Footer />
     </div>
   )
 }

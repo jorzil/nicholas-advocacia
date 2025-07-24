@@ -1,196 +1,150 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, Phone, Mail, MapPin, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useAuth } from "@/contexts/auth-context" // Import useAuth
+import { MenuIcon } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
 import { usePathname } from "next/navigation"
 
 export function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [activeSection, setActiveSection] = useState("")
-  const { user, isLoading, logout } = useAuth() // Get user, isLoading, logout from AuthContext
+  const { user, signOut, loading: authLoading } = useAuth()
   const pathname = usePathname()
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true)
-      } else {
-        setIsScrolled(false)
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith("/#")) {
-      e.preventDefault()
-      const id = href.substring(2)
-      const element = document.getElementById(id)
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" })
-        setActiveSection(id)
-      }
-    } else {
-      // For regular links, let Next.js handle navigation
-      setActiveSection("") // Clear active section for external pages
-    }
+  const handleLogout = async () => {
+    await signOut()
   }
 
-  const navItems = [
-    { name: "Início", href: "/#hero" },
-    { name: "Sobre", href: "/sobre" },
-    { name: "Serviços", href: "/servicos" },
-    { name: "Blog", href: "/blog" },
-    { name: "Contato", href: "/contato" },
-  ]
+  // Determine if the current path is an admin path
+  const isAdminPath = pathname.startsWith("/admin")
 
   return (
-    <header
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-md" : "bg-transparent"
-      }`}
-    >
-      <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/logo-nicholas-nascimento.png"
-            alt="Nicholas Advocacia Logo"
-            width={180}
-            height={40}
-            className="h-auto w-auto"
-            priority
-          />
+    <header className="w-full bg-[#1e2c49] text-white py-4 px-4 md:px-6 flex items-center justify-between shadow-md">
+      <Link href="/" className="flex items-center gap-2" prefetch={false}>
+        <Image
+          src="/logo-nicholas-nascimento.png"
+          alt="Nicholas Nascimento Advocacia"
+          width={180}
+          height={40}
+          className="h-10 w-auto"
+        />
+        <span className="sr-only">Nicholas Nascimento Advocacia</span>
+      </Link>
+      <nav className="hidden md:flex items-center gap-6">
+        <Link href="/" className="text-sm font-medium hover:text-[#d4b26a] transition-colors" prefetch={false}>
+          Início
         </Link>
-        <nav className="hidden items-center gap-6 lg:flex">
-          {navItems.map((item) => (
+        <Link href="/sobre" className="text-sm font-medium hover:text-[#d4b26a] transition-colors" prefetch={false}>
+          Sobre Nós
+        </Link>
+        <Link href="/servicos" className="text-sm font-medium hover:text-[#d4b26a] transition-colors" prefetch={false}>
+          Serviços
+        </Link>
+        <Link href="/blog" className="text-sm font-medium hover:text-[#d4b26a] transition-colors" prefetch={false}>
+          Blog
+        </Link>
+        <Link href="/contato" className="text-sm font-medium hover:text-[#d4b26a] transition-colors" prefetch={false}>
+          Contato
+        </Link>
+        {user && (
+          <>
             <Link
-              key={item.name}
-              href={item.href}
-              onClick={(e) => handleNavClick(e, item.href)}
-              className={`text-lg font-medium transition-colors hover:text-[#d4b26a] ${
-                pathname === item.href || activeSection === item.href.substring(2)
-                  ? "text-[#d4b26a]"
-                  : isScrolled
-                    ? "text-gray-700"
-                    : "text-white"
-              }`}
+              href="/admin/blog"
+              className="text-sm font-medium hover:text-[#d4b26a] transition-colors"
+              prefetch={false}
             >
-              {item.name}
+              Admin Blog
             </Link>
-          ))}
-          {!isLoading && user ? (
-            <>
-              <Link
-                href="/admin/blog"
-                className={`text-lg font-medium transition-colors hover:text-[#d4b26a] ${
-                  pathname === "/admin/blog" ? "text-[#d4b26a]" : isScrolled ? "text-gray-700" : "text-white"
-                }`}
-              >
-                Admin
-              </Link>
-              <Button
-                onClick={logout}
-                variant="ghost"
-                size="sm"
-                className="text-lg font-medium text-red-500 hover:text-red-600"
-              >
-                <LogOut className="mr-2 h-5 w-5" /> Sair
-              </Button>
-            </>
-          ) : (
-            !isLoading &&
-            pathname !== "/admin/login" && (
-              <Link href="/admin/login">
-                <Button variant="ghost" size="sm" className="text-lg font-medium text-white hover:text-[#d4b26a]">
-                  Login Admin
-                </Button>
-              </Link>
-            )
-          )}
-        </nav>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="lg:hidden">
-              <Menu className={`h-6 w-6 ${isScrolled ? "text-gray-700" : "text-white"}`} />
-              <span className="sr-only">Toggle navigation menu</span>
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              size="sm"
+              className="text-sm font-medium text-white hover:bg-[#d4b26a] hover:text-[#1e2c49] transition-colors"
+              disabled={authLoading}
+            >
+              Sair
             </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-full sm:max-w-xs">
-            <div className="flex flex-col items-start gap-4 p-4">
-              <Link href="/" className="mb-4">
-                <Image
-                  src="/logo-nicholas-nascimento.png"
-                  alt="Nicholas Advocacia Logo"
-                  width={180}
-                  height={40}
-                  className="h-auto w-auto"
-                />
-              </Link>
-              {navItems.map((item) => (
+          </>
+        )}
+      </nav>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="md:hidden text-white">
+            <MenuIcon className="h-6 w-6" />
+            <span className="sr-only">Toggle navigation menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right" className="bg-white text-[#1e2c49] w-[250px] sm:w-[300px]">
+          <Link href="/" className="flex items-center gap-2 py-4" prefetch={false}>
+            <Image
+              src="/logo-nicholas-nascimento.png"
+              alt="Nicholas Nascimento Advocacia"
+              width={180}
+              height={40}
+              className="h-10 w-auto"
+            />
+            <span className="sr-only">Nicholas Nascimento Advocacia</span>
+          </Link>
+          <nav className="grid gap-4 py-6">
+            <Link
+              href="/"
+              className="flex w-full items-center py-2 text-lg font-semibold hover:text-[#d4b26a] transition-colors"
+              prefetch={false}
+            >
+              Início
+            </Link>
+            <Link
+              href="/sobre"
+              className="flex w-full items-center py-2 text-lg font-semibold hover:text-[#d4b26a] transition-colors"
+              prefetch={false}
+            >
+              Sobre Nós
+            </Link>
+            <Link
+              href="/servicos"
+              className="flex w-full items-center py-2 text-lg font-semibold hover:text-[#d4b26a] transition-colors"
+              prefetch={false}
+            >
+              Serviços
+            </Link>
+            <Link
+              href="/blog"
+              className="flex w-full items-center py-2 text-lg font-semibold hover:text-[#d4b26a] transition-colors"
+              prefetch={false}
+            >
+              Blog
+            </Link>
+            <Link
+              href="/contato"
+              className="flex w-full items-center py-2 text-lg font-semibold hover:text-[#d4b26a] transition-colors"
+              prefetch={false}
+            >
+              Contato
+            </Link>
+            {user && (
+              <>
                 <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href)}
-                  className="text-lg font-medium text-gray-700 hover:text-[#d4b26a]"
+                  href="/admin/blog"
+                  className="flex w-full items-center py-2 text-lg font-semibold hover:text-[#d4b26a] transition-colors"
+                  prefetch={false}
                 >
-                  {item.name}
+                  Admin Blog
                 </Link>
-              ))}
-              {!isLoading && user ? (
-                <>
-                  <Link href="/admin/blog" className="text-lg font-medium text-gray-700 hover:text-[#d4b26a]">
-                    Admin
-                  </Link>
-                  <Button
-                    onClick={logout}
-                    variant="ghost"
-                    size="sm"
-                    className="text-lg font-medium text-red-500 hover:text-red-600"
-                  >
-                    <LogOut className="mr-2 h-5 w-5" /> Sair
-                  </Button>
-                </>
-              ) : (
-                !isLoading &&
-                pathname !== "/admin/login" && (
-                  <Link href="/admin/login">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-lg font-medium text-gray-700 hover:text-[#d4b26a]"
-                    >
-                      Login Admin
-                    </Button>
-                  </Link>
-                )
-              )}
-              <div className="mt-6 w-full space-y-3 border-t pt-4">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Phone className="h-5 w-5" />
-                  <span>{process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+55 (XX) XXXXX-XXXX"}</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Mail className="h-5 w-5" />
-                  <span>contato@nicholasadvocacia.com.br</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <MapPin className="h-5 w-5" />
-                  <span>Rua Exemplo, 123, Centro, Cidade - SP</span>
-                </div>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
-      </div>
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-lg font-semibold text-[#1e2c49] hover:bg-gray-100 hover:text-[#d4b26a] transition-colors"
+                  disabled={authLoading}
+                >
+                  Sair
+                </Button>
+              </>
+            )}
+          </nav>
+        </SheetContent>
+      </Sheet>
     </header>
   )
 }

@@ -1,183 +1,159 @@
 import Image from "next/image"
-import Link from "next/link"
-import { CheckCircle, Phone, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { UsucapiaoContactForm } from "@/components/usucapiao-contact-form"
-import { UsucapiaoFaq } from "@/components/usucapiao-faq"
-import { FadeIn } from "@/components/fade-in"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Breadcrumb } from "@/components/breadcrumb"
 import { ServiceSidebar } from "@/components/service-sidebar"
-
-export const metadata = {
-  title: "Usucapião - Nicholas Advocacia",
-  description: "Entenda o que é usucapião, seus tipos e como regularizar seu imóvel com a Nicholas Advocacia.",
-  keywords:
-    "usucapião, regularização de imóveis, direito imobiliário, advogado usucapião, tipos de usucapião, como fazer usucapião",
-  openGraph: {
-    title: "Usucapião - Nicholas Advocacia",
-    description: "Entenda o que é usucapião, seus tipos e como regularizar seu imóvel com a Nicholas Advocacia.",
-    url: "https://www.nicholasadvocacia.com.br/servicos/usucapiao",
-  },
-}
+import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer"
+import { UsucapiaoContactForm } from "@/components/usucapiao-contact-form"
+import { UsucapiaoFAQ } from "@/components/usucapiao-faq"
+import { FadeIn } from "@/components/fade-in"
 
 export default function UsucapiaoPage() {
+  const breadcrumbItems = [
+    { label: "Serviços", href: "/servicos" },
+    { label: "Usucapião", href: "/servicos/usucapiao" },
+  ]
+
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 min-h-[400px] flex items-center">
-        <div className="container relative z-10 mx-auto px-4 lg:px-6">
-          <div className="max-w-4xl">
-            <FadeIn direction="up" delay={0.2} className="space-y-6 text-left">
-              <div>
-                <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
-                  Usucapião: Regularize seu Imóvel
-                </h1>
-                <p className="text-xl text-gray-200 mb-6 max-w-3xl">
-                  Garanta a propriedade legal do seu imóvel com segurança e agilidade.
-                </p>
-                <Button size="lg" className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
-                  <Link
-                    href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20usucapião!"
-                    className="flex items-center gap-2"
-                  >
-                    Falar com Especialista
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </Button>
-              </div>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <section
+          className="relative w-full h-[400px] bg-cover bg-center"
+          style={{ backgroundImage: "url('/usucapiao-hero-bg.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <FadeIn>
+              <h1 className="text-5xl font-bold text-white text-center">Usucapião</h1>
             </FadeIn>
           </div>
-        </div>
+        </section>
 
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image src="/usucapiao-hero-bg.png" alt="Fundo de usucapião" fill className="object-cover" priority />
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/50"></div>
-        </div>
-      </section>
+        <section className="py-12 md:py-20 bg-gray-50">
+          <div className="container px-4 md:px-6">
+            <Breadcrumb items={breadcrumbItems} />
+            <div className="flex flex-col lg:flex-row gap-12 mt-8">
+              <div className="lg:w-2/3 space-y-8">
+                <FadeIn>
+                  <h2 className="text-3xl font-bold text-[#1e2c49]">O que é Usucapião?</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    A usucapião é um instituto jurídico que permite a aquisição da propriedade de um bem (móvel ou
+                    imóvel) pela posse prolongada e ininterrupta, desde que cumpridos os requisitos legais. É uma forma
+                    de regularizar a situação de posse e transformá-la em propriedade, garantindo segurança jurídica ao
+                    possuidor.
+                  </p>
+                  <Image
+                    src="/property-legal-documents.png"
+                    alt="Documentos legais de propriedade"
+                    width={800}
+                    height={450}
+                    className="rounded-lg shadow-md mt-6"
+                  />
+                </FadeIn>
 
-      {/* Main Content Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <ServiceSidebar />
-            </div>
+                <FadeIn delay={0.2}>
+                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Tipos de Usucapião</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    Existem diversas modalidades de usucapião, cada uma com seus próprios requisitos de tempo de posse e
+                    características específicas. As principais são:
+                  </p>
+                  <Accordion type="single" collapsible className="w-full mt-6">
+                    <AccordionItem value="item-1">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Usucapião Extrajudicial
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Realizada diretamente em cartório, sem a necessidade de processo judicial, tornando o processo
+                        mais rápido e menos burocrático. Exige consenso entre as partes e documentação completa.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Usucapião Ordinária
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Requer posse mansa e pacífica por 10 anos, justo título e boa-fé. O prazo pode ser reduzido para
+                        5 anos em casos específicos, como aquisição onerosa do imóvel com registro cancelado.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-3">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Usucapião Extraordinária
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Exige posse mansa e pacífica por 15 anos, independentemente de título e boa-fé. O prazo pode ser
+                        reduzido para 10 anos se o possuidor tiver estabelecido no imóvel sua moradia habitual ou
+                        realizado obras de caráter produtivo.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-4">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Usucapião Especial Urbana
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Para imóveis urbanos de até 250m², com posse por 5 anos, utilizada para moradia própria ou da
+                        família, sem ser proprietário de outro imóvel.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-5">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Usucapião Especial Rural
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Para imóveis rurais de até 50 hectares, com posse por 5 anos, tornando-o produtivo por seu
+                        trabalho ou de sua família, e tendo nele sua moradia, sem ser proprietário de outro imóvel.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-6">
+                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
+                        Usucapião Familiar (por Abandono de Lar)
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
+                        Permite que o cônjuge ou companheiro que permaneceu no imóvel após o abandono do lar pelo outro,
+                        adquira a propriedade integral do bem em 2 anos, desde que não possua outro imóvel.
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </FadeIn>
 
-            {/* Content */}
-            <div className="lg:col-span-3">
-              <article className="prose prose-lg max-w-none text-gray-700">
-                <h2>O que é Usucapião?</h2>
-                <p>
-                  A usucapião é um modo de aquisição da propriedade de um bem (móvel ou imóvel) pela posse prolongada,
-                  contínua e ininterrupta, com a intenção de ser dono, e cumprindo os requisitos legais. É uma forma de
-                  regularizar a situação de um imóvel que não possui documentação formal, transformando a posse em
-                  propriedade.
-                </p>
+                <FadeIn delay={0.3}>
+                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Como podemos ajudar?</h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    Nosso escritório é especializado em direito imobiliário e possui vasta experiência em processos de
+                    usucapião, tanto na via judicial quanto na extrajudicial. Oferecemos:
+                  </p>
+                  <ul className="list-disc list-inside text-lg text-gray-700 space-y-2 mt-4">
+                    <li>Análise detalhada da sua situação e da documentação necessária.</li>
+                    <li>Orientação sobre a modalidade de usucapião mais adequada ao seu caso.</li>
+                    <li>Elaboração e acompanhamento de todo o processo, seja judicial ou extrajudicial.</li>
+                    <li>Representação legal para garantir seus direitos e a segurança da sua propriedade.</li>
+                    <li>Assessoria completa para evitar burocracias e agilizar a regularização.</li>
+                  </ul>
+                </FadeIn>
 
-                <h2>Tipos de Usucapião de Imóveis</h2>
-                <p>
-                  Existem diversos tipos de usucapião, cada um com requisitos específicos de tempo de posse e outras
-                  condições:
-                </p>
-                <ul>
-                  <li>
-                    <strong>Usucapião Extraordinária:</strong> Exige 15 anos de posse ininterrupta, sem oposição e sem
-                    necessidade de justo título ou boa-fé. O prazo pode ser reduzido para 10 anos se o possuidor tiver
-                    estabelecido no imóvel sua moradia habitual ou realizado obras ou serviços de caráter produtivo.
-                  </li>
-                  <li>
-                    <strong>Usucapião Ordinária:</strong> Exige 10 anos de posse contínua e incontestada, com justo
-                    título e boa-fé. O prazo pode ser reduzido para 5 anos se o imóvel tiver sido adquirido
-                    onerosamente, com base em registro cancelado, e os possuidores nele tiverem estabelecido sua moradia
-                    ou realizado investimentos de interesse social e econômico.
-                  </li>
-                  <li>
-                    <strong>Usucapião Especial Urbana:</strong> Exige 5 anos de posse ininterrupta e sem oposição, de
-                    área urbana de até 250 m², utilizada para moradia própria ou da família, desde que o possuidor não
-                    seja proprietário de outro imóvel urbano ou rural.
-                  </li>
-                  <li>
-                    <strong>Usucapião Especial Rural (Pro Labore):</strong> Exige 5 anos de posse ininterrupta e sem
-                    oposição, de área rural de até 50 hectares, utilizada para moradia e tornando-a produtiva pelo
-                    trabalho próprio ou da família, desde que o possuidor não seja proprietário de outro imóvel.
-                  </li>
-                  <li>
-                    <strong>Usucapião Familiar (por Abandono de Lar):</strong> Exige 2 anos de posse ininterrupta e sem
-                    oposição, de imóvel urbano de até 250 m², por ex-cônjuge ou ex-companheiro que ficou na posse do
-                    imóvel após o abandono do lar pelo outro, utilizando-o para sua moradia ou de sua família, desde que
-                    não seja proprietário de outro imóvel.
-                  </li>
-                  <li>
-                    <strong>Usucapião Coletiva:</strong> Aplicável a áreas urbanas ocupadas por população de baixa renda
-                    para sua moradia, por 5 anos ininterruptos e sem oposição, onde não for possível identificar os
-                    terrenos ocupados por cada possuidor.
-                  </li>
-                </ul>
+                <FadeIn delay={0.4}>
+                  <UsucapiaoFAQ />
+                </FadeIn>
 
-                <h2>Como a Nicholas Advocacia Pode Ajudar?</h2>
-                <p>
-                  Nosso escritório é especializado em Direito Imobiliário e possui vasta experiência em processos de
-                  usucapião, tanto na via judicial quanto na extrajudicial. Oferecemos:
-                </p>
-                <ul>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Análise detalhada do seu caso para identificar o tipo de usucapião aplicável e os documentos
-                    necessários.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Orientação completa sobre os requisitos legais e os passos do processo.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Elaboração e acompanhamento de toda a documentação.
-                  </li>
-                  <li>
-                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
-                    Representação jurídica em todas as etapas, buscando a solução mais rápida e eficiente.
-                  </li>
-                </ul>
-
-                <p>
-                  Não adie a regularização do seu patrimônio. Entre em contato conosco e agende uma consulta para
-                  avaliar seu caso.
-                </p>
-
-                <div className="mt-8 text-center">
-                  <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
-                    <Link
-                      href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20usucapião!"
-                      className="flex items-center gap-2"
-                    >
-                      <Phone className="h-5 w-5" />
-                      Falar com Especialista
-                    </Link>
-                  </Button>
-                </div>
-              </article>
-
-              {/* FAQ Section */}
-              <div className="mt-16">
-                <h2 className="text-3xl font-bold text-[#1e2c49] mb-8 text-center">
-                  Perguntas Frequentes sobre Usucapião
-                </h2>
-                <UsucapiaoFaq />
+                <FadeIn delay={0.5}>
+                  <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                    <h2 className="text-3xl font-bold text-[#1e2c49] mb-6 text-center">Fale Conosco</h2>
+                    <p className="text-lg text-gray-700 mb-6 text-center">
+                      Preencha o formulário abaixo para agendar uma consulta e regularizar seu imóvel.
+                    </p>
+                    <UsucapiaoContactForm />
+                  </div>
+                </FadeIn>
               </div>
 
-              {/* Contact Form Section */}
-              <div className="mt-16 p-6 bg-gray-50 rounded-lg shadow-md">
-                <h2 className="text-3xl font-bold text-[#1e2c49] mb-8 text-center">
-                  Solicite uma Avaliação do seu Caso de Usucapião
-                </h2>
-                <UsucapiaoContactForm />
+              <div className="lg:w-1/3">
+                <ServiceSidebar />
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <WhatsAppButton />
+      <Footer />
     </div>
   )
 }

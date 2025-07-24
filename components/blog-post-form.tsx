@@ -1,246 +1,189 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { format } from "date-fns"
-import { CalendarIcon, Loader2 } from "lucide-react"
+import type React from "react"
 
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { cn } from "@/lib/utils"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
-import { RichTextEditor } from "@/components/rich-text-editor"
-import { ImageUpload } from "@/components/image-upload"
-import { Badge } from "@/components/ui/badge"
-
-const formSchema = z.object({
-  title: z.string().min(5, "O título deve ter pelo menos 5 caracteres."),
-  slug: z
-    .string()
-    .min(5, "O slug deve ter pelo menos 5 caracteres.")
-    .regex(/^[a-z0-9-]+$/, "O slug deve conter apenas letras minúsculas, números e hífens."),
-  content: z.string().min(50, "O conteúdo deve ter pelo menos 50 caracteres."),
-  author: z.string().min(3, "O autor deve ter pelo menos 3 caracteres."),
-  published_at: z.date({ required_error: "A data de publicação é obrigatória." }), // Changed to published_at
-  status: z.enum(["published", "draft"]),
-  tags: z.array(z.string()).min(1, "Selecione pelo menos uma tag."),
-  featured_image: z.string().optional(), // Changed to featured_image
-})
-
-type BlogPostFormValues = z.infer<typeof formSchema>
+import { ImageUpload } from "./image-upload"
+import { RichTextEditor } from "./rich-text-editor"
 
 interface BlogPostFormProps {
-  initialData?: BlogPostFormValues & { id?: string }
+  initialData?: {
+    id?: string
+    title: string
+    content: string
+    imageUrl?: string
+    author: string
+    tags?: string[]
+    slug: string
+    description: string
+  }
 }
 
 export function BlogPostForm({ initialData }: BlogPostFormProps) {
-  const router = useRouter()
+  const [title, setTitle] = useState(initialData?.title || "")
+  const [content, setContent] = useState(initialData?.content || "")
+  const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || "")
+  const [author, setAuthor] = useState(initialData?.author || "Nicholas Nascimento")
+  const [tags, setTags] = useState(initialData?.tags?.join(", ") || "")
+  const [slug, setSlug] = useState(initialData?.slug || "")
+  const [description, setDescription] = useState(initialData?.description || "")
+  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  const [isPending, startTransition] = useTransition()
-  const [newTag, setNewTag] = useState("")
-
-  const form = useForm<BlogPostFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      title: "",
-      slug: "",
-      content: "",
-      author: "Nicholas Nascimento", // Default author
-      published_at: new Date(), // Changed to published_at
-      status: "draft",
-      tags: [],
-      featured_image: "", // Changed to featured_image
-    },
-  })
-
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    watch,
-    formState: { errors },
-  } = form
-  const watchedTags = watch("tags")
-  const watchedContent = watch("content")
-  const watchedFeaturedImage = watch("featured_image") // Changed to featured_image
+  const router = useRouter()
 
   useEffect(() => {
-    if (initialData?.content) {
-      setValue("content", initialData.content, { shouldValidate: true })
+    if (title && !initialData?.slug) {
+      setSlug(
+        title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-*|-*$/g, ""),
+      )
     }
-    if (initialData?.featured_image) {
-      // Changed to featured_image
-      setValue("featured_image", initialData.featured_image, { shouldValidate: true }) // Changed to featured_image
-    }
-  }, [initialData, setValue])
+  }, [title, initialData?.slug])
 
-  const onSubmit = async (values: BlogPostFormValues) => {
-    startTransition(async () => {
-      try {
-        const method = initialData?.id ? "PUT" : "POST"
-        const url = initialData?.id
-          ? `${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog/${initialData.id}`
-          : `${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog`
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
 
-        const response = await fetch(url, {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        })
+    const method = initialData?.id ? "PUT" : "POST"
+    const url = initialData?.id ? `/api/admin/blog/${initialData.id}` : "/api/admin/blog"
 
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.message || "Erro ao salvar o post.")
-        }
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          content,
+          imageUrl,
+          author,
+          tags: tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+          slug,
+          description,
+        }),
+      })
 
+      if (res.ok) {
         toast({
           title: "Sucesso!",
-          description: `Post ${initialData?.id ? "atualizado" : "criado"} com sucesso.`,
+          description: `Postagem ${initialData?.id ? "atualizada" : "criada"} com sucesso.`,
         })
         router.push("/admin/blog")
-        router.refresh() // Revalidate data on the blog management page
-      } catch (error: any) {
+        router.refresh()
+      } else {
+        const errorData = await res.json()
         toast({
           title: "Erro",
-          description: error.message || "Ocorreu um erro ao salvar o post.",
+          description: errorData.error || `Falha ao ${initialData?.id ? "atualizar" : "criar"} a postagem.`,
           variant: "destructive",
         })
       }
-    })
-  }
-
-  const handleAddTag = () => {
-    if (newTag && !watchedTags.includes(newTag)) {
-      setValue("tags", [...watchedTags, newTag])
-      setNewTag("")
+    } catch (error) {
+      console.error("Erro ao enviar formulário:", error)
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro de rede. Tente novamente.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleRemoveTag = (tagToRemove: string) => {
-    setValue(
-      "tags",
-      watchedTags.filter((tag) => tag !== tagToRemove),
-    )
-  }
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">{initialData?.id ? "Editar Postagem" : "Nova Postagem"}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
             <Label htmlFor="title">Título</Label>
-            <Input id="title" {...register("title")} />
-            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
-          </div>
-          <div>
-            <Label htmlFor="slug">Slug</Label>
-            <Input id="slug" {...register("slug")} />
-            {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>}
-          </div>
-          <div>
-            <Label htmlFor="author">Autor</Label>
-            <Input id="author" {...register("author")} />
-            {errors.author && <p className="text-red-500 text-sm mt-1">{errors.author.message}</p>}
-          </div>
-          <div>
-            <Label htmlFor="published_at">Data de Publicação</Label> {/* Changed to published_at */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !watch("published_at") && "text-muted-foreground", // Changed to published_at
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watch("published_at") ? format(watch("published_at"), "PPP") : <span>Escolha uma data</span>}{" "}
-                  {/* Changed to published_at */}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={watch("published_at")} // Changed to published_at
-                  onSelect={(date) => setValue("published_at", date!)} // Changed to published_at
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            {errors.published_at && <p className="text-red-500 text-sm mt-1">{errors.published_at.message}</p>}{" "}
-            {/* Changed to published_at */}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="status"
-              checked={watch("status") === "published"}
-              onCheckedChange={(checked) => setValue("status", checked ? "published" : "draft")}
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Título da postagem"
+              required
             />
-            <Label htmlFor="status">Publicar Post</Label>
           </div>
-          <div>
-            <Label htmlFor="tags">Tags</Label>
-            <div className="flex gap-2 mb-2">
-              <Input
-                id="newTag"
-                placeholder="Adicionar nova tag"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault()
-                    handleAddTag()
-                  }
-                }}
-              />
-              <Button type="button" onClick={handleAddTag}>
-                Adicionar
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {watchedTags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                  {tag}
-                  <button type="button" onClick={() => handleRemoveTag(tag)} className="ml-1 text-xs">
-                    &times;
-                  </button>
-                </Badge>
-              ))}
-            </div>
-            {errors.tags && <p className="text-red-500 text-sm mt-1">{errors.tags.message}</p>}
+          <div className="space-y-2">
+            <Label htmlFor="slug">Slug (URL amigável)</Label>
+            <Input
+              id="slug"
+              value={slug}
+              onChange={(e) =>
+                setSlug(
+                  e.target.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-*|-*$/g, ""),
+                )
+              }
+              placeholder="slug-da-postagem"
+              required
+            />
           </div>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="featured_image">Imagem Destacada</Label> {/* Changed to featured_image */}
-            <ImageUpload value={watchedFeaturedImage} onChange={(url) => setValue("featured_image", url)} />{" "}
-            {/* Changed to featured_image */}
-            {errors.featured_image && <p className="text-red-500 text-sm mt-1">{errors.featured_image.message}</p>}{" "}
-            {/* Changed to featured_image */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Descrição Curta (SEO)</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Uma breve descrição para SEO e prévia do artigo"
+              rows={3}
+              required
+            />
           </div>
-        </div>
-      </div>
-      <div>
-        <Label htmlFor="content">Conteúdo do Post</Label>
-        <RichTextEditor
-          value={watchedContent}
-          onChange={(value) => setValue("content", value, { shouldValidate: true })}
-        />
-        {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>}
-      </div>
-      <Button type="submit" disabled={isPending}>
-        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {initialData?.id ? "Atualizar Post" : "Criar Post"}
-      </Button>
-    </form>
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl">URL da Imagem de Capa</Label>
+            <ImageUpload onUploadComplete={setImageUrl} initialImageUrl={imageUrl} />
+            {imageUrl && (
+              <div className="mt-2">
+                <img
+                  src={imageUrl || "/placeholder.svg"}
+                  alt="Prévia da Imagem"
+                  className="max-w-xs h-auto rounded-md"
+                />
+              </div>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="content">Conteúdo</Label>
+            <RichTextEditor content={content} onContentChange={setContent} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="author">Autor</Label>
+            <Input
+              id="author"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="Nome do autor"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
+            <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="tag1, tag2, tag3" />
+          </div>
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Salvando..." : initialData?.id ? "Atualizar Postagem" : "Criar Postagem"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

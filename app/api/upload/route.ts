@@ -6,11 +6,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   const filename = searchParams.get("filename")
 
   if (!filename) {
-    return NextResponse.json({ message: "Filename is required" }, { status: 400 })
+    return NextResponse.json({ error: "Filename is required" }, { status: 400 })
   }
 
   if (!request.body) {
-    return NextResponse.json({ message: "Request body is empty" }, { status: 400 })
+    return NextResponse.json({ error: "Request body is empty" }, { status: 400 })
   }
 
   try {
@@ -21,6 +21,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json(blob)
   } catch (error) {
     console.error("Error uploading blob:", error)
-    return NextResponse.json({ message: "Failed to upload file", error: (error as Error).message }, { status: 500 })
+    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 })
   }
 }

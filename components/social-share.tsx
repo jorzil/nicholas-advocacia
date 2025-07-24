@@ -1,60 +1,50 @@
 "use client"
 
-import { Facebook, Twitter, Linkedin, LinkIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Facebook, Linkedin, Twitter, PhoneIcon as Whatsapp } from "lucide-react"
 
 interface SocialShareProps {
-  url: string
   title: string
+  url: string
 }
 
-export function SocialShare({ url, title }: SocialShareProps) {
-  const encodedUrl = encodeURIComponent(url)
-  const encodedTitle = encodeURIComponent(title)
+export function SocialShare({ title, url }: SocialShareProps) {
+  const shareOnFacebook = () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank")
+  }
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(url)
-    alert("Link copiado para a área de transferência!")
+  const shareOnTwitter = () => {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
+      "_blank",
+    )
+  }
+
+  const shareOnLinkedin = () => {
+    window.open(
+      `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`,
+      "_blank",
+    )
+  }
+
+  const shareOnWhatsapp = () => {
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`${title} ${url}`)}`, "_blank")
   }
 
   return (
-    <div className="flex items-center space-x-4 my-6">
-      <span className="text-gray-600 text-sm">Compartilhar:</span>
-      <div className="flex space-x-2">
-        <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-          aria-label="Compartilhar no Facebook"
-        >
-          <Facebook size={16} />
-        </a>
-        <a
-          href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-2 bg-blue-400 text-white rounded-full hover:bg-blue-500 transition-colors"
-          aria-label="Compartilhar no Twitter"
-        >
-          <Twitter size={16} />
-        </a>
-        <a
-          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-2 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-colors"
-          aria-label="Compartilhar no LinkedIn"
-        >
-          <Linkedin size={16} />
-        </a>
-        <button
-          onClick={copyToClipboard}
-          className="p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors"
-          aria-label="Copiar link"
-        >
-          <LinkIcon size={16} />
-        </button>
-      </div>
+    <div className="flex gap-2">
+      <Button variant="outline" size="icon" onClick={shareOnFacebook} aria-label="Compartilhar no Facebook">
+        <Facebook className="h-5 w-5 text-blue-600" />
+      </Button>
+      <Button variant="outline" size="icon" onClick={shareOnTwitter} aria-label="Compartilhar no Twitter">
+        <Twitter className="h-5 w-5 text-blue-400" />
+      </Button>
+      <Button variant="outline" size="icon" onClick={shareOnLinkedin} aria-label="Compartilhar no LinkedIn">
+        <Linkedin className="h-5 w-5 text-blue-700" />
+      </Button>
+      <Button variant="outline" size="icon" onClick={shareOnWhatsapp} aria-label="Compartilhar no WhatsApp">
+        <Whatsapp className="h-5 w-5 text-green-500" />
+      </Button>
     </div>
   )
 }
