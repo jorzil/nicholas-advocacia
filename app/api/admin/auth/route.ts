@@ -1,51 +1,29 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-import { cookies } from "next/headers"
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error("Missing Supabase environment variables")
-}
+import { serialize } from "cookie"
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json()
-  const cookieStore = cookies()
+  const { username, password } = await request.json()
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: false,
-    },
-  })
+  // In a real application, you would validate these against a database
+  // and use secure password hashing (e.g., bcrypt).
+  // For this example, we'll use simple environment variables.
+  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin"
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123"
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-
-  if (error) {
-    console.error("Supabase sign-in error:", error.message)
-    return NextResponse.json({ error: error.message }, { status: 401 })
-  }
-
-  // Set cookies for the session
-  if (data.session) {
-    cookieStore.set("supabase-access-token", data.session.access_token, {
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    // Set a simple cookie for authentication
+    const cookie = serialize("auth_token", "true", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production", // Use secure in production
+      maxAge: 60 * 60 * 24 * 7, // 1 week
       path: "/",
-      maxAge: data.session.expires_in,
     })
-    cookieStore.set("supabase-refresh-token", data.session.refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: data.session.expires_in,
-    })
-  }
 
-  return NextResponse.json({ message: "Login successful" }, { status: 200 })
+    return new NextResponse(JSON.stringify({ success: true, message: "Login successful" }), {
+      status: 200,
+      headers: { "Set-Cookie": cookie },
+    })
+  } else {
+    return NextResponse.json({ success: false, message: "Invalid credentials" }, { status: 401 })
+  }
 }

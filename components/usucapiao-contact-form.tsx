@@ -3,147 +3,139 @@
 import type React from "react"
 
 import { useState } from "react"
+import { Send } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { CalendarIcon, ClockIcon, MailIcon, PhoneIcon, UserIcon } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/hooks/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function UsucapiaoContactForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    date: "",
-    time: "",
-    message: "",
-  })
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
-  const [responseMessage, setResponseMessage] = useState("")
+  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [usucapiaoType, setUsucapiaoType] = useState("")
+  const [timePossession, setTimePossession] = useState("")
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setStatus("loading")
-    setResponseMessage("")
+    setIsSubmitting(true)
+
+    const formData = new FormData(e.currentTarget)
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
+      message: formData.get("message") as string,
+      usucapiaoType,
+      possessionTime: timePossession, // Corrected key to match API route
+      subject: "Consulta sobre Usucapião",
+      formType: "usucapiao",
+    }
 
     try {
-      const res = await fetch("/api/send-email", {
+      const response = await fetch("/api/send-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          subject: "Novo Contato - Usucapião",
-          body: `
-            Nome: ${formData.name}
-            Email: ${formData.email}
-            Telefone: ${formData.phone}
-            Data Preferida: ${formData.date}
-            Hora Preferida: ${formData.time}
-            Mensagem: ${formData.message || "Nenhuma mensagem adicional."}
-          `,
-        }),
+        body: JSON.stringify(data),
       })
 
-      if (res.ok) {
-        setStatus("success")
-        setResponseMessage("Sua solicitação foi enviada com sucesso! Entraremos em contato em breve.")
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          date: "",
-          time: "",
-          message: "",
+      const result = await response.json()
+
+      if (result.success) {
+        toast({
+          title: "Mensagem enviada",
+          description: "Entraremos em contato em breve para avaliar seu caso.",
         })
+        // Reset form
+        const form = e.target as HTMLFormElement
+        form.reset()
+        setUsucapiaoType("")
+        setTimePossession("")
       } else {
-        const errorData = await res.json()
-        setStatus("error")
-        setResponseMessage(errorData.message || "Ocorreu um erro ao enviar sua solicitação. Tente novamente.")
+        console.error("API error:", result.message)
+        throw new Error(result.message || "Erro desconhecido ao enviar mensagem.")
       }
     } catch (error) {
-      console.error("Erro ao enviar formulário:", error)
-      setStatus("error")
-      setResponseMessage("Ocorreu um erro de rede. Por favor, tente novamente mais tarde.")
+      console.error("Error submitting usucapiao form:", error)
+      toast({
+        title: "Erro ao enviar",
+        description: "Tente novamente ou entre em contato pelo WhatsApp.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name" className="flex items-center gap-2 text-gray-700">
-          <UserIcon className="h-4 w-4" /> Nome Completo
-        </Label>
-        <Input id="name" placeholder="Seu nome" value={formData.name} onChange={handleChange} required />
+        <Label htmlFor="name">Nome completo</Label>
+        <Input id="name" name="name" required placeholder="Seu nome" />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email" className="flex items-center gap-2 text-gray-700">
-          <MailIcon className="h-4 w-4" /> Email
-        </Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="seu@email.com"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
+        <Label htmlFor="email">Email</Label>
+        <Input id="email" name="email" type="email" required placeholder="seu@email.com" />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phone" className="flex items-center gap-2 text-gray-700">
-          <PhoneIcon className="h-4 w-4" /> Telefone
-        </Label>
-        <Input
-          id="phone"
-          type="tel"
-          placeholder="(XX) XXXXX-XXXX"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-        />
+        <Label htmlFor="phone">Telefone/WhatsApp</Label>
+        <Input id="phone" name="phone" required placeholder="(00) 00000-0000" />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="date" className="flex items-center gap-2 text-gray-700">
-          <CalendarIcon className="h-4 w-4" /> Data Preferida
-        </Label>
-        <Input id="date" type="date" value={formData.date} onChange={handleChange} required />
+        <Label htmlFor="usucapiao-type">Tipo de Usucapião</Label>
+        <Select name="usucapiao-type" value={usucapiaoType} onValueChange={setUsucapiaoType}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione uma opção" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="extraordinaria">Extraordinária</SelectItem>
+            <SelectItem value="ordinaria">Ordinária</SelectItem>
+            <SelectItem value="especial-urbana">Especial Urbana</SelectItem>
+            <SelectItem value="especial-rural">Especial Rural</SelectItem>
+            <SelectItem value="familiar">Familiar</SelectItem>
+            <SelectItem value="coletiva">Coletiva</SelectItem>
+            <SelectItem value="nao-sei">Não sei / Não tenho certeza</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      <div className="space-y-2 sm:col-span-2">
-        <Label htmlFor="time" className="flex items-center gap-2 text-gray-700">
-          <ClockIcon className="h-4 w-4" /> Hora Preferida
-        </Label>
-        <Input id="time" type="time" value={formData.time} onChange={handleChange} required />
+      <div className="space-y-2">
+        <Label htmlFor="time-possession">Tempo de posse do imóvel</Label>
+        <Select name="time-possession" value={timePossession} onValueChange={setTimePossession}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione uma opção" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="menos-2">Menos de 2 anos</SelectItem>
+            <SelectItem value="2-5">Entre 2 e 5 anos</SelectItem>
+            <SelectItem value="5-10">Entre 5 e 10 anos</SelectItem>
+            <SelectItem value="10-15">Entre 10 e 15 anos</SelectItem>
+            <SelectItem value="mais-15">Mais de 15 anos</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      <div className="space-y-2 sm:col-span-2">
-        <Label htmlFor="message" className="flex items-center gap-2 text-gray-700">
-          Mensagem (Opcional)
-        </Label>
+      <div className="space-y-2">
+        <Label htmlFor="message">Descreva brevemente seu caso</Label>
         <Textarea
           id="message"
-          placeholder="Descreva brevemente sua necessidade jurídica..."
-          value={formData.message}
-          onChange={handleChange}
-          rows={4}
+          name="message"
+          placeholder="Conte-nos sobre o imóvel e sua situação..."
+          className="min-h-[100px]"
         />
       </div>
-      <div className="sm:col-span-2">
-        <Button
-          type="submit"
-          className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c0a05e] transition-colors py-3 text-lg font-semibold"
-          disabled={status === "loading"}
-        >
-          {status === "loading" ? "Enviando..." : "Enviar Solicitação"}
-        </Button>
-      </div>
-      {status === "success" && (
-        <p className="sm:col-span-2 text-center text-green-600 font-medium">{responseMessage}</p>
-      )}
-      {status === "error" && <p className="sm:col-span-2 text-center text-red-600 font-medium">{responseMessage}</p>}
+      <Button type="submit" className="w-full bg-[#1e2c49] text-white hover:bg-[#2a3c5e]" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>Enviando...</>
+        ) : (
+          <>
+            <Send className="mr-2 h-4 w-4" /> Solicitar Avaliação
+          </>
+        )}
+      </Button>
+      <p className="text-center text-xs text-gray-500">Ao enviar, você concorda com nossa política de privacidade.</p>
     </form>
   )
 }

@@ -1,56 +1,55 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { type NextRequest, NextResponse } from "next/server"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+// Mock database - replace with your actual database
+const blogPosts = [
+  {
+    id: "1",
+    title: "Getting Started with Next.js 14",
+    content: "<h2>Introduction</h2><p>Next.js 14 brings exciting new features...</p>",
+    author: "John Doe",
+    publishedAt: "2024-01-15T10:00:00Z",
+    tags: ["nextjs", "react", "web-development"],
+    featuredImage: "/nextjs-tutorial.png",
+    status: "published" as const,
+    excerpt: "Learn how to get started with Next.js 14 and its new features.",
+  },
+  {
+    id: "2",
+    title: "Advanced React Patterns",
+    content: "<h2>React Patterns</h2><p>Exploring advanced patterns in React...</p>",
+    author: "Jane Smith",
+    publishedAt: "2024-01-10T14:30:00Z",
+    tags: ["react", "patterns", "javascript"],
+    featuredImage: "/react-patterns.png",
+    status: "draft" as const,
+    excerpt: "Deep dive into advanced React patterns and best practices.",
+  },
+]
 
-if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
-  throw new Error("Missing Supabase environment variables")
+export async function GET() {
+  try {
+    // Sort by publication date, newest first
+    const sortedPosts = blogPosts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    return NextResponse.json(sortedPosts)
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 })
+  }
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const query = searchParams.get("query")
-  const page = Number.parseInt(searchParams.get("page") || "1")
-  const limit = Number.parseInt(searchParams.get("limit") || "10")
-  const offset = (page - 1) * limit
+    const newPost = {
+      id: Date.now().toString(),
+      ...body,
+      publishedAt: new Date(body.publishedAt).toISOString(),
+    }
 
-  let dbQuery = supabase.from("blog_posts").select("*", { count: "exact" }).order("created_at", { ascending: false })
+    blogPosts.unshift(newPost)
 
-  if (query) {
-    dbQuery = dbQuery.ilike("title", `%${query}%`)
+    return NextResponse.json(newPost, { status: 201 })
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to create post" }, { status: 500 })
   }
-
-  const { data, error, count } = await dbQuery.range(offset, offset + limit - 1)
-
-  if (error) {
-    console.error("Error fetching blog posts:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
-  return NextResponse.json({
-    posts: data,
-    total: count,
-    page,
-    limit,
-  })
-}
-
-export async function POST(request: Request) {
-  const { title, content, imageUrl, author, tags, slug, description } = await request.json()
-
-  const { data, error } = await supabase
-    .from("blog_posts")
-    .insert([{ title, content, image_url: imageUrl, author, tags, slug, description }])
-    .select()
-
-  if (error) {
-    console.error("Error creating blog post:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
-  return NextResponse.json(data[0], { status: 201 })
 }

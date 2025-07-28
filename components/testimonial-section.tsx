@@ -1,80 +1,69 @@
-import NextImage from "next/image"
-import { Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import { FadeIn } from "@/components/fade-in"
-import { GoogleReviews } from "@/components/google-reviews"
+import { Star } from "lucide-react"
+import NextImage from "next/image"
 
 export function TestimonialSection() {
   const testimonials = [
     {
-      name: "Maria S.",
+      name: "Maria Silva",
       role: "Cliente Usucapião",
-      image: "/middle-aged-woman-portrait.png",
+      text: "O Dr. Nicholas resolveu meu caso de usucapião com muita competência e agilidade. Recomendo!",
       rating: 5,
-      text: "O Dr. Nicholas foi fundamental para regularizar meu imóvel. Um processo que parecia impossível se tornou simples e rápido com a assessoria dele. Recomendo demais!",
+      avatar: "/professional-female-lawyer.png", // Placeholder image
     },
     {
-      name: "João P.",
+      name: "João Santos",
+      role: "Cliente Regularização",
+      text: "Profissional muito dedicado e conhecedor do direito imobiliário. Conseguiu regularizar meu imóvel sem complicações.",
+      rating: 5,
+      avatar: "/middle-aged-man-portrait.png", // Placeholder image
+    },
+    {
+      name: "Ana Costa",
       role: "Cliente Contratos",
-      image: "/middle-aged-man-portrait.png",
+      text: "Atendimento excepcional! Esclareceu todas as dúvidas sobre meu contrato de compra e venda. Muito profissional!",
       rating: 5,
-      text: "Precisei de ajuda com um contrato de compra e venda e a equipe foi extremamente atenciosa e profissional. Me senti seguro em cada etapa. Excelente trabalho!",
+      avatar: "/middle-aged-woman-portrait.png", // Placeholder image
     },
     {
-      name: "Ana L.",
-      role: "Cliente Litígios",
-      image: "/professional-female-lawyer.png",
+      name: "Carlos Oliveira",
+      role: "Cliente Condominial",
+      text: "Advogado competente e honesto. Resolveu minha questão condominial de forma rápida e eficiente. Recomendo!",
       rating: 5,
-      text: "Tive um problema sério com um vizinho e o escritório Nicholas Advocacia resolveu tudo com muita competência e agilidade. Sou muito grata pelo suporte.",
+      avatar: "/professional-lawyer-portrait.png", // Placeholder image
     },
   ]
 
   const renderStars = (rating: number) => {
-    const stars = []
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        <Star
-          key={i}
-          className={`h-5 w-5 ${i < rating ? "fill-yellow-400 text-yellow-400" : "fill-gray-300 text-gray-300"}`}
-        />,
-      )
-    }
-    return stars
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star key={i} className={`h-4 w-4 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} />
+    ))
   }
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
-      <div className="container px-4 md:px-6 text-center">
-        <FadeIn>
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-[#1e2c49] mb-8">
-            O que nossos clientes dizem
-          </h2>
-          <p className="mx-auto max-w-[700px] text-gray-700 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mb-12">
-            Veja as avaliações de quem já confiou em nossos serviços e alcançou seus objetivos.
-          </p>
-        </FadeIn>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+    <section className="py-16 bg-white">
+      <div className="container mx-auto px-4 lg:px-6">
+        <h2 className="text-3xl font-bold text-[#1e2c49] mb-12 text-center md:text-4xl">O que nossos clientes dizem</h2>
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <FadeIn key={index} delay={0.1 * index}>
-              <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardContent className="flex flex-col items-center text-center p-6">
+            <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="relative w-20 h-20 mb-4">
                   <NextImage
-                    src={testimonial.image}
+                    src={testimonial.avatar || "/placeholder.svg"}
                     alt={testimonial.name}
-                    width={80}
-                    height={80}
-                    className="rounded-full object-cover mb-4 border-2 border-[#d4b26a]"
+                    fill
+                    className="rounded-full object-cover"
                   />
-                  <div className="flex mb-2">{renderStars(testimonial.rating)}</div>
-                  <p className="text-gray-700 italic mb-4 flex-grow">"{testimonial.text}"</p>
-                  <h3 className="font-bold text-[#1e2c49]">{testimonial.name}</h3>
-                  <p className="text-sm text-gray-500">{testimonial.role}</p>
-                </CardContent>
-              </Card>
-            </FadeIn>
+                </div>
+                <h3 className="text-xl font-semibold text-[#1e2c49] mb-1">{testimonial.name}</h3>
+                <p className="text-gray-600 text-sm mb-3">{testimonial.role}</p>
+                <div className="flex mb-4">{renderStars(testimonial.rating)}</div>
+                <p className="text-gray-700 italic">"{testimonial.text}"</p>
+              </CardContent>
+            </Card>
           ))}
         </div>
-        <GoogleReviews />
       </div>
     </section>
   )

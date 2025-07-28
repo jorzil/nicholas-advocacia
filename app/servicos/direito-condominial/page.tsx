@@ -1,148 +1,141 @@
 import Image from "next/image"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Breadcrumb } from "@/components/breadcrumb"
-import { ServiceSidebar } from "@/components/service-sidebar"
-import { WhatsAppButton } from "@/components/whatsapp-button"
-import { Footer } from "@/components/footer"
-import { SchedulingForm } from "@/components/scheduling-form"
+import Link from "next/link"
+import { CheckCircle, Phone, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ContactForm } from "@/components/contact-form" // Reusing general contact form
 import { FadeIn } from "@/components/fade-in"
+import { ServiceSidebar } from "@/components/service-sidebar"
+
+export const metadata = {
+  title: "Direito Condominial - Nicholas Advocacia",
+  description: "Assessoria jurídica para condomínios, síndicos e condôminos em questões de direito condominial.",
+  keywords:
+    "direito condominial, condomínio, síndico, condômino, conflitos condominiais, cobrança de condomínio, advogado condominial",
+  openGraph: {
+    title: "Direito Condominial - Nicholas Advocacia",
+    description: "Assessoria jurídica para condomínios, síndicos e condôminos em questões de direito condominial.",
+    url: "https://www.nicholasadvocacia.com.br/servicos/direito-condominial",
+  },
+}
 
 export default function DireitoCondominialPage() {
-  const breadcrumbItems = [
-    { label: "Serviços", href: "/servicos" },
-    { label: "Direito Condominial", href: "/servicos/direito-condominial" },
-  ]
-
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1">
-        <section
-          className="relative w-full h-[400px] bg-cover bg-center"
-          style={{ backgroundImage: "url('/condominium-building.png')" }}
-        >
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <FadeIn>
-              <h1 className="text-5xl font-bold text-white text-center">Direito Condominial</h1>
+    <div className="flex min-h-screen flex-col">
+      {/* Hero Section */}
+      <section className="relative py-20 md:py-28 min-h-[400px] flex items-center">
+        <div className="container relative z-10 mx-auto px-4 lg:px-6">
+          <div className="max-w-4xl">
+            <FadeIn direction="up" delay={0.2} className="space-y-6 text-left">
+              <div>
+                <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
+                  Direito Condominial
+                </h1>
+                <p className="text-xl text-gray-200 mb-6 max-w-3xl">
+                  Soluções jurídicas para síndicos, condomínios e condôminos.
+                </p>
+                <Button size="lg" className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
+                  <Link
+                    href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20direito%20condominial!"
+                    className="flex items-center gap-2"
+                  >
+                    Falar com Especialista
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
             </FadeIn>
           </div>
-        </section>
+        </div>
 
-        <section className="py-12 md:py-20 bg-gray-50">
-          <div className="container px-4 md:px-6">
-            <Breadcrumb items={breadcrumbItems} />
-            <div className="flex flex-col lg:flex-row gap-12 mt-8">
-              <div className="lg:w-2/3 space-y-8">
-                <FadeIn>
-                  <h2 className="text-3xl font-bold text-[#1e2c49]">Assessoria Jurídica para Condomínios</h2>
-                  <p className="text-lg text-gray-700 leading-relaxed">
-                    O direito condominial abrange uma série de normas e regulamentos que regem a vida em condomínios,
-                    sejam eles residenciais ou comerciais. Conflitos entre moradores, inadimplência, questões
-                    trabalhistas e a necessidade de atualização de regimentos internos são desafios comuns. Nosso
-                    escritório oferece assessoria jurídica completa para síndicos, administradoras e condôminos.
-                  </p>
-                  <Image
-                    src="/condominium-building.png"
-                    alt="Edifício de condomínio"
-                    width={800}
-                    height={450}
-                    className="rounded-lg shadow-md mt-6"
-                  />
-                </FadeIn>
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/condominium-building-icon-white.png" // Placeholder image
+            alt="Fundo de direito condominial"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Dark overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
+      </section>
 
-                <FadeIn delay={0.2}>
-                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Nossos Serviços em Direito Condominial</h2>
-                  <p className="text-lg text-gray-700 leading-relaxed">
-                    Atuamos em diversas frentes para garantir a boa gestão e a harmonia no condomínio:
-                  </p>
-                  <Accordion type="single" collapsible className="w-full mt-6">
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Cobrança de Inadimplentes
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Ações de cobrança de cotas condominiais em atraso, buscando a recuperação dos valores devidos de
-                        forma eficiente.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-2">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Elaboração e Revisão de Convenção e Regimento Interno
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Criação ou atualização dos documentos que regem o condomínio, garantindo clareza e conformidade
-                        legal.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-3">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Assessoria em Assembleias
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Orientação jurídica para a realização de assembleias, elaboração de atas e cumprimento das
-                        deliberações.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-4">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Resolução de Conflitos
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Mediação e representação em disputas entre condôminos, síndicos e administradoras.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-5">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Questões Trabalhistas
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Assessoria em questões relacionadas a funcionários do condomínio, como contratação, demissão e
-                        passivos trabalhistas.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-6">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Responsabilidade Civil do Condomínio e Síndico
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Orientação sobre as responsabilidades legais do condomínio e do síndico, prevenindo ações
-                        judiciais.
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </FadeIn>
+      {/* Main Content Section */}
+      <section className="bg-white py-16">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <ServiceSidebar />
+            </div>
 
-                <FadeIn delay={0.3}>
-                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Benefícios da Assessoria Jurídica</h2>
-                  <ul className="list-disc list-inside text-lg text-gray-700 space-y-2 mt-4">
-                    <li>Redução da inadimplência.</li>
-                    <li>Prevenção de litígios e ações judiciais.</li>
-                    <li>Gestão condominial mais eficiente e segura.</li>
-                    <li>Harmonia entre os moradores.</li>
-                    <li>Conformidade com a legislação vigente.</li>
-                    <li>Proteção do patrimônio do condomínio e dos condôminos.</li>
-                  </ul>
-                </FadeIn>
+            {/* Content */}
+            <div className="lg:col-span-3">
+              <article className="prose prose-lg max-w-none text-gray-700">
+                <h2>Assessoria Jurídica para Condomínios e Condôminos</h2>
+                <p>
+                  O Direito Condominial abrange as relações jurídicas que surgem dentro de um condomínio, envolvendo
+                  síndicos, administradoras e condôminos. Conflitos são comuns e exigem uma atuação jurídica
+                  especializada para garantir a harmonia e o cumprimento das regras.
+                </p>
 
-                <FadeIn delay={0.4}>
-                  <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
-                    <h2 className="text-3xl font-bold text-[#1e2c49] mb-6 text-center">Fale Conosco</h2>
-                    <p className="text-lg text-gray-700 mb-6 text-center">
-                      Garanta a tranquilidade e a segurança jurídica do seu condomínio.
-                    </p>
-                    <SchedulingForm />
-                  </div>
-                </FadeIn>
-              </div>
+                <h2>Nossa Atuação em Direito Condominial</h2>
+                <p>Oferecemos suporte jurídico para:</p>
+                <ul>
+                  <li>
+                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
+                    <strong>Síndicos e Administradoras:</strong> Assessoria na elaboração e revisão de convenções e
+                    regimentos internos, cobrança de cotas condominiais, representação em assembleias, e resolução de
+                    conflitos.
+                  </li>
+                  <li>
+                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
+                    <strong>Condôminos:</strong> Defesa em casos de cobranças indevidas, multas, problemas com obras,
+                    conflitos com vizinhos, e representação em assembleias.
+                  </li>
+                  <li>
+                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
+                    <strong>Elaboração de Pareceres:</strong> Análise e emissão de pareceres sobre questões jurídicas
+                    complexas do condomínio.
+                  </li>
+                  <li>
+                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
+                    <strong>Mediação de Conflitos:</strong> Atuação para mediar e resolver disputas de forma amigável,
+                    evitando a judicialização.
+                  </li>
+                </ul>
 
-              <div className="lg:w-1/3">
-                <ServiceSidebar />
+                <h2>Por que Escolher a Nicholas Advocacia?</h2>
+                <p>
+                  Com nossa experiência em Direito Condominial, ajudamos a manter a ordem e a legalidade no seu
+                  condomínio, protegendo os direitos de todos e promovendo um ambiente de convivência pacífica.
+                </p>
+
+                <div className="mt-8 text-center">
+                  <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
+                    <Link
+                      href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20direito%20condominial!"
+                      className="flex items-center gap-2"
+                    >
+                      <Phone className="h-5 w-5" />
+                      Falar com Especialista
+                    </Link>
+                  </Button>
+                </div>
+              </article>
+
+              {/* Contact Form Section */}
+              <div className="mt-16 p-6 bg-gray-50 rounded-lg shadow-md">
+                <h2 className="text-3xl font-bold text-[#1e2c49] mb-8 text-center">
+                  Precisa de Ajuda com Questões Condominiais?
+                </h2>
+                <ContactForm />
               </div>
             </div>
           </div>
-        </section>
-      </main>
-      <WhatsAppButton />
-      <Footer />
+        </div>
+      </section>
     </div>
   )
 }

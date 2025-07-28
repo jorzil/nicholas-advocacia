@@ -8,51 +8,45 @@ const GOOGLE_BUSINESS_NAME = process.env.GOOGLE_BUSINESS_NAME || "Nicholas Nasci
 const fallbackReviews = [
   {
     author_name: "Maria Silva",
-    author_url: "#",
     rating: 5,
     text: "Excelente atendimento! O Dr. Nicholas resolveu meu problema de usucapião com muita competência e agilidade. Recomendo!",
-    relative_time_description: "há 2 dias",
-    profile_photo_url: "/placeholder.svg?height=40&width=40&text=MS",
+    time: Date.now() / 1000, // Convert ms to seconds for consistency with Google API
+    profile_photo_url: "/placeholder.svg?height=40&width=40",
   },
   {
     author_name: "João Santos",
-    author_url: "#",
     rating: 5,
     text: "Profissional muito competente e atencioso. Me ajudou com a regularização do meu imóvel. Serviço de qualidade!",
-    relative_time_description: "há 1 semana",
-    profile_photo_url: "/placeholder.svg?height=40&width=40&text=JS",
+    time: Date.now() / 1000 - 86400 * 5, // 5 days ago
+    profile_photo_url: "/placeholder.svg?height=40&width=40",
   },
   {
     author_name: "Ana Costa",
-    author_url: "#",
     rating: 5,
     text: "Escritório de confiança! Atendimento personalizado e resultados excelentes. Muito satisfeita com os serviços.",
-    relative_time_description: "há 2 semanas",
-    profile_photo_url: "/placeholder.svg?height=40&width=40&text=AC",
+    time: Date.now() / 1000 - 86400 * 10, // 10 days ago
+    profile_photo_url: "/placeholder.svg?height=40&width=40",
   },
   {
     author_name: "Carlos Oliveira",
-    author_url: "#",
     rating: 5,
     text: "Advogado especialista em direito imobiliário. Resolveu minha questão condominial rapidamente. Muito satisfeita!",
-    relative_time_description: "há 3 semanas",
-    profile_photo_url: "/placeholder.svg?height=40&width=40&text=CO",
+    time: Date.now() / 1000 - 86400 * 15, // 15 days ago
+    profile_photo_url: "/placeholder.svg?height=40&width=40",
   },
   {
     author_name: "Fernanda Lima",
-    author_url: "#",
     rating: 5,
     text: "Excelente trabalho na regularização do meu imóvel. Dr. Nicholas é muito atencioso e explica tudo detalhadamente.",
-    relative_time_description: "há 1 mês",
-    profile_photo_url: "/placeholder.svg?height=40&width=40&text=FL",
+    time: Date.now() / 1000 - 86400 * 20, // 20 days ago
+    profile_photo_url: "/placeholder.svg?height=40&width=40",
   },
   {
     author_name: "Pedro Almeida",
-    author_url: "#",
     rating: 5,
     text: "Atendimento rápido e eficiente. Recomendo para quem busca soluções em direito imobiliário.",
-    relative_time_description: "há 1 mês",
-    profile_photo_url: "/placeholder.svg?height=40&width=40&text=PA",
+    time: Date.now() / 1000 - 86400 * 25, // 25 days ago
+    profile_photo_url: "/placeholder.svg?height=40&width=40",
   },
 ]
 
@@ -60,8 +54,8 @@ export async function GET() {
   const defaultResponse = {
     reviews: fallbackReviews,
     rating: 5.0,
-    userRatingsTotal: 25, // A reasonable default total
-    businessName: GOOGLE_BUSINESS_NAME,
+    user_ratings_total: 25, // A reasonable default total
+    name: GOOGLE_BUSINESS_NAME,
     place_id: GOOGLE_PLACE_ID,
     source: "fallback",
   }
@@ -94,10 +88,10 @@ export async function GET() {
     if (data.status === "OK" && data.result) {
       const reviews = data.result.reviews || []
       return NextResponse.json({
-        reviews: reviews.length > 0 ? reviews : fallbackReviews, // Use fallback if Google returns empty reviews
+        reviews: reviews.length > 0 ? reviews : fallbackReviews,
         rating: data.result.rating || 5.0,
-        userRatingsTotal: data.result.user_ratings_total || defaultResponse.userRatingsTotal,
-        businessName: data.result.name || GOOGLE_BUSINESS_NAME,
+        user_ratings_total: data.result.user_ratings_total || defaultResponse.user_ratings_total,
+        name: data.result.name || GOOGLE_BUSINESS_NAME,
         place_id: GOOGLE_PLACE_ID,
         source: reviews.length > 0 ? "google" : "fallback",
       })

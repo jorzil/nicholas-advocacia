@@ -4,76 +4,76 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2 } from "lucide-react"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { toast } = useToast()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    setIsLoading(true)
 
     try {
-      const res = await fetch("/api/admin/auth", {
+      const response = await fetch("/api/admin/auth", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       })
 
-      if (res.ok) {
+      const data = await response.json()
+
+      if (response.ok) {
         toast({
-          title: "Login bem-sucedido!",
-          description: "Você foi redirecionado para o painel de administração.",
+          title: "Login bem-sucedido",
+          description: "Redirecionando para o painel de administração...",
         })
-        router.push("/admin/blog")
-        router.refresh() // Refresh to update session context
+        router.push("/admin/blog") // Redirect to the admin dashboard
       } else {
-        const errorData = await res.json()
         toast({
-          title: "Erro no Login",
-          description: errorData.error || "Credenciais inválidas. Tente novamente.",
+          title: "Erro de Login",
+          description: data.message || "Credenciais inválidas. Tente novamente.",
           variant: "destructive",
         })
       }
     } catch (error) {
       console.error("Erro ao fazer login:", error)
       toast({
-        title: "Erro",
-        description: "Ocorreu um erro de rede. Por favor, tente novamente mais tarde.",
+        title: "Erro de Rede",
+        description: "Não foi possível conectar ao servidor. Verifique sua conexão.",
         variant: "destructive",
       })
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center text-[#1e2c49]">Login Admin</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Login do Administrador</CardTitle>
+          <CardDescription>Acesse o painel de gerenciamento do blog.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Usuário</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="admin@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                placeholder="Digite seu usuário"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
@@ -82,23 +82,20 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Sua senha"
+                placeholder="Digite sua senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
-            <Button type="submit" className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c0a05e]" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Entrando...
-                </>
-              ) : (
-                "Entrar"
-              )}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
+        <CardFooter className="text-center text-sm text-gray-500">
+          <p>Apenas usuários autorizados podem acessar esta área.</p>
+        </CardFooter>
       </Card>
     </div>
   )

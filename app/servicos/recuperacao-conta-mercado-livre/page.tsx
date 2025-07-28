@@ -1,146 +1,142 @@
 import Image from "next/image"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Breadcrumb } from "@/components/breadcrumb"
-import { ServiceSidebar } from "@/components/service-sidebar"
-import { WhatsAppButton } from "@/components/whatsapp-button"
-import { Footer } from "@/components/footer"
-import { SchedulingForm } from "@/components/scheduling-form"
+import Link from "next/link"
+import { CheckCircle, Phone, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ContactForm } from "@/components/contact-form" // Reusing general contact form
 import { FadeIn } from "@/components/fade-in"
+import { ServiceSidebar } from "@/components/service-sidebar"
+
+const ChevronRight = ArrowRight // Declare the variable before using it
+
+export const metadata = {
+  title: "Recuperação de Conta Mercado Livre - Nicholas Advocacia",
+  description: "Assessoria jurídica para vendedores com contas suspensas ou bloqueadas no Mercado Livre.",
+  keywords:
+    "recuperação conta mercado livre, conta bloqueada mercado livre, conta suspensa mercado livre, advogado mercado livre, direito digital, e-commerce",
+  openGraph: {
+    title: "Recuperação de Conta Mercado Livre - Nicholas Advocacia",
+    description: "Assessoria jurídica para vendedores com contas suspensas ou bloqueadas no Mercado Livre.",
+    url: "https://www.nicholasadvocacia.com.br/servicos/recuperacao-conta-mercado-livre",
+  },
+}
 
 export default function RecuperacaoContaMercadoLivrePage() {
-  const breadcrumbItems = [
-    { label: "Serviços", href: "/servicos" },
-    { label: "Recuperação de Conta Mercado Livre", href: "/servicos/recuperacao-conta-mercado-livre" },
-  ]
-
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1">
-        <section
-          className="relative w-full h-[400px] bg-cover bg-center"
-          style={{ backgroundImage: "url('/marketplace-suspension-hero.png')" }}
-        >
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <FadeIn>
-              <h1 className="text-5xl font-bold text-white text-center">Recuperação de Conta Mercado Livre</h1>
+    <div className="flex min-h-screen flex-col">
+      {/* Hero Section */}
+      <section className="relative py-20 md:py-28 min-h-[400px] flex items-center">
+        <div className="container relative z-10 mx-auto px-4 lg:px-6">
+          <div className="max-w-4xl">
+            <FadeIn direction="up" delay={0.2} className="space-y-6 text-left">
+              <div>
+                <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
+                  Recuperação de Conta Mercado Livre
+                </h1>
+                <p className="text-xl text-gray-200 mb-6 max-w-3xl">
+                  Assessoria jurídica para vendedores com contas suspensas ou bloqueadas.
+                </p>
+                <Button size="lg" className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
+                  <Link
+                    href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20recuperação%20de%20conta%20Mercado%20Livre!"
+                    className="flex items-center gap-2"
+                  >
+                    Falar com Especialista
+                    <ChevronRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
             </FadeIn>
           </div>
-        </section>
+        </div>
 
-        <section className="py-12 md:py-20 bg-gray-50">
-          <div className="container px-4 md:px-6">
-            <Breadcrumb items={breadcrumbItems} />
-            <div className="flex flex-col lg:flex-row gap-12 mt-8">
-              <div className="lg:w-2/3 space-y-8">
-                <FadeIn>
-                  <h2 className="text-3xl font-bold text-[#1e2c49]">Sua Conta no Mercado Livre Foi Suspensa?</h2>
-                  <p className="text-lg text-gray-700 leading-relaxed">
-                    A suspensão de uma conta no Mercado Livre pode ser um grande problema para vendedores e compradores,
-                    impactando diretamente suas operações e rendimentos. Muitas vezes, a suspensão ocorre por motivos
-                    que podem ser contestados ou regularizados com a devida assessoria jurídica. Nosso escritório é
-                    especializado em direito digital e pode te ajudar a recuperar o acesso à sua conta.
-                  </p>
-                  <Image
-                    src="/marketplace-suspension-hero.png"
-                    alt="Aviso de suspensão de marketplace"
-                    width={800}
-                    height={450}
-                    className="rounded-lg shadow-md mt-6"
-                  />
-                </FadeIn>
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/marketplace-suspension-hero.png" // Placeholder image
+            alt="Fundo de recuperação de conta Mercado Livre"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Dark overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
+      </section>
 
-                <FadeIn delay={0.2}>
-                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Como Podemos Ajudar?</h2>
-                  <p className="text-lg text-gray-700 leading-relaxed">
-                    Oferecemos um serviço completo para auxiliar na recuperação de contas suspensas no Mercado Livre:
-                  </p>
-                  <Accordion type="single" collapsible className="w-full mt-6">
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Análise do Motivo da Suspensão
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Investigamos a fundo a razão da suspensão da sua conta, analisando as políticas do Mercado Livre
-                        e a comunicação recebida.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-2">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Elaboração de Defesa e Recursos Administrativos
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Preparamos e enviamos recursos e contestações formais ao Mercado Livre, apresentando os
-                        argumentos e provas necessárias para reverter a suspensão.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-3">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Negociação e Mediação
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Atuamos na comunicação com o Mercado Livre para buscar uma solução amigável e rápida para o seu
-                        caso.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-4">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Ações Judiciais (se necessário)
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Em casos onde a via administrativa não é suficiente, ingressamos com as medidas judiciais
-                        cabíveis para garantir seus direitos.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-5">
-                      <AccordionTrigger className="text-xl font-semibold text-[#1e2c49] hover:text-[#d4b26a]">
-                        Orientação para Prevenção
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-700 text-base leading-relaxed">
-                        Após a recuperação, oferecemos orientações para que você evite futuras suspensões, garantindo a
-                        conformidade com as regras da plataforma.
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </FadeIn>
+      {/* Main Content Section */}
+      <section className="bg-white py-16">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <ServiceSidebar />
+            </div>
 
-                <FadeIn delay={0.3}>
-                  <h2 className="text-3xl font-bold text-[#1e2c49] mt-10">Por que a suspensão ocorre?</h2>
-                  <p className="text-lg text-gray-700 leading-relaxed">
-                    As suspensões de conta no Mercado Livre podem ocorrer por diversos motivos, como:
-                  </p>
-                  <ul className="list-disc list-inside text-lg text-gray-700 space-y-2 mt-4">
-                    <li>Infrações às políticas de uso da plataforma.</li>
-                    <li>Problemas com vendas (cancelamentos, reclamações).</li>
-                    <li>Inadimplência ou dívidas com o Mercado Livre.</li>
-                    <li>Uso de dados incorretos ou incompletos.</li>
-                    <li>Atividades consideradas fraudulentas ou suspeitas.</li>
-                  </ul>
-                  <p className="text-lg text-gray-700 leading-relaxed mt-4">
-                    É crucial entender o motivo exato para traçar a melhor estratégia de recuperação.
-                  </p>
-                </FadeIn>
+            {/* Content */}
+            <div className="lg:col-span-3">
+              <article className="prose prose-lg max-w-none text-gray-700">
+                <h2>Conta Suspensa ou Bloqueada no Mercado Livre?</h2>
+                <p>
+                  A suspensão ou bloqueio de contas no Mercado Livre pode causar grandes prejuízos para vendedores,
+                  interrompendo suas operações e afetando sua renda. Muitas vezes, essas medidas são aplicadas de forma
+                  indevida ou sem a devida justificativa.
+                </p>
 
-                <FadeIn delay={0.4}>
-                  <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
-                    <h2 className="text-3xl font-bold text-[#1e2c49] mb-6 text-center">Recupere Sua Conta Agora!</h2>
-                    <p className="text-lg text-gray-700 mb-6 text-center">
-                      Não perca mais tempo e dinheiro. Entre em contato para que possamos analisar seu caso e iniciar o
-                      processo de recuperação.
-                    </p>
-                    <SchedulingForm />
-                  </div>
-                </FadeIn>
-              </div>
+                <h2>Como a Nicholas Advocacia Pode Ajudar?</h2>
+                <p>Oferecemos assessoria jurídica especializada para:</p>
+                <ul>
+                  <li>
+                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
+                    <strong>Análise do Caso:</strong> Avaliação dos motivos da suspensão/bloqueio e da viabilidade de
+                    reversão.
+                  </li>
+                  <li>
+                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
+                    <strong>Notificações e Recursos:</strong> Elaboração de notificações extrajudiciais e recursos
+                    administrativos ao Mercado Livre.
+                  </li>
+                  <li>
+                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
+                    <strong>Ações Judiciais:</strong> Propositura de ações judiciais para desbloqueio da conta,
+                    indenização por perdas e danos, e outras medidas cabíveis.
+                  </li>
+                  <li>
+                    <CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" />
+                    <strong>Defesa de Direitos:</strong> Proteção dos direitos do vendedor contra práticas abusivas da
+                    plataforma.
+                  </li>
+                </ul>
 
-              <div className="lg:w-1/3">
-                <ServiceSidebar />
+                <h2>Por que Escolher a Nicholas Advocacia?</h2>
+                <p>
+                  Com nossa expertise em direito digital e e-commerce, atuamos para reverter a suspensão ou bloqueio da
+                  sua conta no Mercado Livre, minimizando seus prejuízos e garantindo a continuidade das suas vendas.
+                </p>
+
+                <div className="mt-8 text-center">
+                  <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
+                    <Link
+                      href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20recuperação%20de%20conta%20Mercado%20Livre!"
+                      className="flex items-center gap-2"
+                    >
+                      <Phone className="h-5 w-5" />
+                      Falar com Especialista
+                    </Link>
+                  </Button>
+                </div>
+              </article>
+
+              {/* Contact Form Section */}
+              <div className="mt-16 p-6 bg-gray-50 rounded-lg shadow-md">
+                <h2 className="text-3xl font-bold text-[#1e2c49] mb-8 text-center">
+                  Solicite Ajuda para Recuperar sua Conta
+                </h2>
+                <ContactForm />
               </div>
             </div>
           </div>
-        </section>
-      </main>
-      <WhatsAppButton />
-      <Footer />
+        </div>
+      </section>
     </div>
   )
 }

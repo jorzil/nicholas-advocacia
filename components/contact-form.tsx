@@ -3,133 +3,112 @@
 import type React from "react"
 
 import { useState } from "react"
+import { Send } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MailIcon, PhoneIcon, UserIcon } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/hooks/use-toast"
 
 export function ContactForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  })
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
-  const [responseMessage, setResponseMessage] = useState("")
+  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setStatus("loading")
-    setResponseMessage("")
+    setIsSubmitting(true)
+
+    const formData = new FormData(e.currentTarget)
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
+      subject: formData.get("subject") as string,
+      message: formData.get("message") as string,
+      formType: "contact", // Explicitly set form type
+    }
 
     try {
-      const res = await fetch("/api/send-email", {
+      const response = await fetch("/api/send-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          subject: "Novo Contato do Site",
-          body: `
-            Nome: ${formData.name}
-            Email: ${formData.email}
-            Telefone: ${formData.phone}
-            Mensagem: ${formData.message}
-          `,
-        }),
+        body: JSON.stringify(data),
       })
 
-      if (res.ok) {
-        setStatus("success")
-        setResponseMessage("Sua mensagem foi enviada com sucesso! Entraremos em contato em breve.")
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          message: "",
+      const result = await response.json()
+
+      if (result.success) {
+        toast({
+          title: "Mensagem enviada",
+          description: "Entraremos em contato em breve.",
         })
+        // Reset form
+        const form = e.target as HTMLFormElement
+        form.reset()
       } else {
-        const errorData = await res.json()
-        setStatus("error")
-        setResponseMessage(errorData.message || "Ocorreu um erro ao enviar sua mensagem. Tente novamente.")
+        // Log the specific error message from the API if available
+        console.error("API error:", result.message)
+        throw new Error(result.message || "Erro desconhecido ao enviar mensagem.")
       }
     } catch (error) {
-      console.error("Erro ao enviar formulário:", error)
-      setStatus("error")
-      setResponseMessage("Ocorreu um erro de rede. Por favor, tente novamente mais tarde.")
+      console.error("Error submitting contact form:", error)
+      toast({
+        title: "Erro ao enviar",
+        description: "Tente novamente ou entre em contato pelo WhatsApp.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-lg">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-[#1e2c49]">Entre em Contato</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="flex items-center gap-2 text-gray-700">
-              <UserIcon className="h-4 w-4" /> Nome Completo
-            </Label>
-            <Input id="name" placeholder="Seu nome" value={formData.name} onChange={handleChange} required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2 text-gray-700">
-              <MailIcon className="h-4 w-4" /> Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="phone" className="flex items-center gap-2 text-gray-700">
-              <PhoneIcon className="h-4 w-4" /> Telefone (Opcional)
-            </Label>
-            <Input id="phone" type="tel" placeholder="(XX) XXXXX-XXXX" value={formData.phone} onChange={handleChange} />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="message" className="flex items-center gap-2 text-gray-700">
-              Sua Mensagem
-            </Label>
-            <Textarea
-              id="message"
-              placeholder="Descreva sua necessidade jurídica..."
-              value={formData.message}
-              onChange={handleChange}
-              rows={5}
-              required
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <Button
-              type="submit"
-              className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c0a05e] transition-colors py-3 text-lg font-semibold"
-              disabled={status === "loading"}
-            >
-              {status === "loading" ? "Enviando..." : "Enviar Mensagem"}
-            </Button>
-          </div>
-          {status === "success" && (
-            <p className="sm:col-span-2 text-center text-green-600 font-medium">{responseMessage}</p>
-          )}
-          {status === "error" && (
-            <p className="sm:col-span-2 text-center text-red-600 font-medium">{responseMessage}</p>
-          )}
-        </form>
-      </CardContent>
-    </Card>
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-lg bg-white p-6 shadow-lg">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="name">Nome</Label>
+          <Input id="name" name="name" required placeholder="Seu nome completo" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" name="email" type="email" required placeholder="seu@email.com" />
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="phone">Telefone</Label>
+          <Input id="phone" name="phone" placeholder="(00) 00000-0000" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="subject">Assunto</Label>
+          <Input id="subject" name="subject" required placeholder="Assunto da mensagem" />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="message">Mensagem</Label>
+        <Textarea
+          id="message"
+          name="message"
+          required
+          placeholder="Descreva seu problema ou dúvida..."
+          className="min-h-[120px]"
+        />
+      </div>
+      <Button type="submit" className="w-full bg-[#1e2c49] text-white hover:bg-[#2a3c5e]" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>Enviando...</>
+        ) : (
+          <>
+            <Send className="mr-2 h-4 w-4" /> Solicitar Contato Prioritário
+          </>
+        )}
+      </Button>
+      <p className="mt-2 text-center text-xs text-gray-500">
+        Ao enviar, você concorda com nossa política de privacidade. Responderemos em até 24h.
+      </p>
+    </form>
   )
 }

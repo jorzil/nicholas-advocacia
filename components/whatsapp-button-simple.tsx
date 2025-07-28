@@ -1,18 +1,24 @@
-import Link from "next/link"
+"use client"
+
 import Image from "next/image"
+import Link from "next/link"
 
 export function WhatsAppButtonSimple() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5511999999999" // Default number
-
   return (
     <Link
-      href={`https://wa.me/${whatsappNumber}`}
+      href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!"
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-4 right-4 z-50 bg-green-500 rounded-full p-3 shadow-lg hover:scale-110 transition-transform duration-300"
-      aria-label="Fale conosco pelo WhatsApp"
+      className="inline-flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-lg hover:bg-[#20b858] transition-colors"
     >
-      <Image src="/whatsapp-icon-new.png" alt="WhatsApp" width={48} height={48} className="w-12 h-12" />
+      <Image
+        src="/whatsapp-icon-new.png"
+        alt="WhatsApp"
+        width={20}
+        height={20}
+        className="filter brightness-0 invert"
+      />
+      WhatsApp
     </Link>
   )
 }

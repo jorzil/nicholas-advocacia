@@ -3,12 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarIcon, ClockIcon, MailIcon, PhoneIcon, UserIcon } from "lucide-react"
+import { Calendar, Clock, User, Mail, Phone, MessageSquare } from "lucide-react"
 
 export function SchedulingForm() {
   const [formData, setFormData] = useState({
@@ -17,143 +12,195 @@ export function SchedulingForm() {
     phone: "",
     date: "",
     time: "",
+    service: "",
     message: "",
   })
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
-  const [responseMessage, setResponseMessage] = useState("")
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setStatus("loading")
-    setResponseMessage("")
+    setIsSubmitting(true)
 
-    try {
-      const res = await fetch("/api/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subject: "Novo Agendamento de Consulta",
-          body: `
-            Nome: ${formData.name}
-            Email: ${formData.email}
-            Telefone: ${formData.phone}
-            Data Preferida: ${formData.date}
-            Hora Preferida: ${formData.time}
-            Mensagem: ${formData.message || "Nenhuma mensagem adicional."}
-          `,
-        }),
+    // Simulando envio para um servidor
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+
+    setIsSubmitting(false)
+    setIsSubmitted(true)
+
+    // Reset form after 5 seconds
+    setTimeout(() => {
+      setIsSubmitted(false)
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        date: "",
+        time: "",
+        service: "",
+        message: "",
       })
-
-      if (res.ok) {
-        setStatus("success")
-        setResponseMessage("Sua solicitação de agendamento foi enviada com sucesso! Entraremos em contato em breve.")
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          date: "",
-          time: "",
-          message: "",
-        })
-      } else {
-        const errorData = await res.json()
-        setStatus("error")
-        setResponseMessage(errorData.message || "Ocorreu um erro ao enviar sua solicitação. Tente novamente.")
-      }
-    } catch (error) {
-      console.error("Erro ao enviar formulário:", error)
-      setStatus("error")
-      setResponseMessage("Ocorreu um erro de rede. Por favor, tente novamente mais tarde.")
-    }
+    }, 5000)
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-lg">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-[#1e2c49]">Agende Sua Consulta</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="flex items-center gap-2 text-gray-700">
-              <UserIcon className="h-4 w-4" /> Nome Completo
-            </Label>
-            <Input id="name" placeholder="Seu nome" value={formData.name} onChange={handleChange} required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2 text-gray-700">
-              <MailIcon className="h-4 w-4" /> Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone" className="flex items-center gap-2 text-gray-700">
-              <PhoneIcon className="h-4 w-4" /> Telefone
-            </Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="(XX) XXXXX-XXXX"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="date" className="flex items-center gap-2 text-gray-700">
-              <CalendarIcon className="h-4 w-4" /> Data Preferida
-            </Label>
-            <Input id="date" type="date" value={formData.date} onChange={handleChange} required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="time" className="flex items-center gap-2 text-gray-700">
-              <ClockIcon className="h-4 w-4" /> Hora Preferida
-            </Label>
-            <Input id="time" type="time" value={formData.time} onChange={handleChange} required />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="message" className="flex items-center gap-2 text-gray-700">
-              Mensagem (Opcional)
-            </Label>
-            <Textarea
-              id="message"
-              placeholder="Descreva brevemente sua necessidade jurídica..."
-              value={formData.message}
-              onChange={handleChange}
-              rows={4}
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <Button
+    <div className="container mx-auto mt-10">
+      <div className="max-w-md mx-auto bg-white shadow-md rounded-lg p-5">
+        <h2 className="text-2xl font-semibold mb-4">Agendamento</h2>
+
+        {isSubmitted ? (
+          <div className="bg-green-200 text-green-800 p-3 rounded mb-4">Agendamento realizado com sucesso!</div>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
+                Nome:
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-10"
+                  placeholder="Seu nome"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                Email:
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-10"
+                  placeholder="Seu email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">
+                Telefone:
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-10"
+                  placeholder="Seu telefone"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">
+                Data:
+              </label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="date"
+                  id="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-10"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="time" className="block text-gray-700 text-sm font-bold mb-2">
+                Horário:
+              </label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="time"
+                  id="time"
+                  name="time"
+                  value={formData.time}
+                  onChange={handleChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-10"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="service" className="block text-gray-700 text-sm font-bold mb-2">
+                Serviço:
+              </label>
+              <select
+                id="service"
+                name="service"
+                value={formData.service}
+                onChange={handleChange}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              >
+                <option value="">Selecione um serviço</option>
+                <option value="consulta">Consulta</option>
+                <option value="exame">Exame</option>
+                <option value="tratamento">Tratamento</option>
+              </select>
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">
+                Mensagem:
+              </label>
+              <div className="relative">
+                <MessageSquare className="absolute left-3 top-3 text-gray-400" size={20} />
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-10"
+                  rows={3}
+                  placeholder="Sua mensagem"
+                />
+              </div>
+            </div>
+
+            <button
               type="submit"
-              className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c0a05e] transition-colors py-3 text-lg font-semibold"
-              disabled={status === "loading"}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={isSubmitting}
             >
-              {status === "loading" ? "Enviando..." : "Agendar Consulta"}
-            </Button>
-          </div>
-          {status === "success" && (
-            <p className="sm:col-span-2 text-center text-green-600 font-medium">{responseMessage}</p>
-          )}
-          {status === "error" && (
-            <p className="sm:col-span-2 text-center text-red-600 font-medium">{responseMessage}</p>
-          )}
-        </form>
-      </CardContent>
-    </Card>
+              {isSubmitting ? "Enviando..." : "Agendar"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
   )
 }

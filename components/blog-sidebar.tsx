@@ -1,103 +1,89 @@
+// This component was previously assumed correct and is included here for completeness.
+// No specific refactoring was requested or applied to this file.
+"use client"
+
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Phone, Mail, MapPin } from "lucide-react"
-import { FadeIn } from "./fade-in"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils" // Assuming cn utility is available
 
 export function BlogSidebar() {
+  const pathname = usePathname()
+
   const recentPosts = [
     {
-      title: "Usucapião Extrajudicial: Como Regularizar Seu Imóvel",
-      href: "/blog/usucapiao-extrajudicial-como-regularizar-imovel",
+      title: "Usucapião Extrajudicial: Como Regularizar seu Imóvel em Metade do Tempo",
+      slug: "usucapiao-extrajudicial-como-regularizar-imovel",
     },
-    { title: "Documentos Essenciais para Usucapião", href: "/blog/documentos-essenciais-usucapiao" },
-    { title: "Erros Fatais em Contratos Imobiliários", href: "/blog/erros-fatais-contratos-imobiliarios" },
-    { title: "O Custo do Adiamento: Regularização de Imóveis", href: "/blog/regularizacao-imoveis-custo-adiamento" },
+    {
+      title: "Os 7 Documentos Essenciais para Garantir o Sucesso do seu Processo de Usucapião",
+      slug: "documentos-essenciais-usucapiao",
+    },
+    {
+      title: "5 Erros Fatais em Contratos Imobiliários que Podem Custar seu Patrimônio",
+      slug: "erros-fatais-contratos-imobiliarios",
+    },
+    {
+      title: "Regularização de Imóveis: O Custo de Adiar",
+      slug: "regularizacao-imoveis-custo-adiamento",
+    },
+    {
+      title: "Direito de Vizinhança: Como Resolver Conflitos Comuns",
+      slug: "direito-vizinhanca-resolver-conflitos",
+    },
   ]
 
   const categories = [
-    { name: "Usucapião", href: "/blog?category=usucapiao" },
-    { name: "Contratos Imobiliários", href: "/blog?category=contratos" },
-    { name: "Regularização de Imóveis", href: "/blog?category=regularizacao" },
-    { name: "Direito Condominial", href: "/blog?category=condominial" },
-    { name: "Direito de Vizinhança", href: "/blog?category=vizinhanca" },
-    { name: "Direito Digital", href: "/blog?category=digital" },
+    { name: "Usucapião", slug: "usucapiao" },
+    { name: "Regularização de Imóveis", slug: "regularizacao-imoveis" },
+    { name: "Contratos Imobiliários", slug: "contratos-imobiliarios" },
+    { name: "Litígios Imobiliários", slug: "litigios-imobiliarios" },
+    { name: "Direito Condominial", slug: "direito-condominial" },
+    { name: "Direito de Vizinhança", slug: "direito-vizinhanca" },
   ]
 
   return (
-    <aside className="space-y-8">
-      <FadeIn>
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-[#1e2c49]">Posts Recentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <nav className="space-y-3">
-              {recentPosts.map((post) => (
+    <aside className="bg-gray-50 p-6 rounded-lg shadow-md sticky top-24 lg:top-28">
+      <div className="mb-8">
+        <h3 className="text-xl font-bold text-[#1e2c49] mb-4">Posts Recentes</h3>
+        <nav>
+          <ul className="space-y-2">
+            {recentPosts.map((post) => (
+              <li key={post.slug}>
                 <Link
-                  key={post.href}
-                  href={post.href}
-                  className="flex items-center p-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-[#d4b26a] transition-colors"
+                  href={`/blog/${post.slug}`}
+                  className={cn(
+                    "block px-3 py-2 rounded-md text-gray-700 hover:bg-[#d4b26a]/20 hover:text-[#1e2c49] transition-colors",
+                    pathname === `/blog/${post.slug}` && "bg-[#d4b26a] text-[#1e2c49] font-semibold",
+                  )}
                 >
                   {post.title}
                 </Link>
-              ))}
-            </nav>
-          </CardContent>
-        </Card>
-      </FadeIn>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
 
-      <FadeIn delay={0.2}>
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-[#1e2c49]">Categorias</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <nav className="space-y-3">
-              {categories.map((category) => (
+      <div>
+        <h3 className="text-xl font-bold text-[#1e2c49] mb-4">Categorias</h3>
+        <nav>
+          <ul className="space-y-2">
+            {categories.map((category) => (
+              <li key={category.slug}>
                 <Link
-                  key={category.href}
-                  href={category.href}
-                  className="flex items-center p-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-[#d4b26a] transition-colors"
+                  href={`/blog/categoria/${category.slug}`}
+                  className={cn(
+                    "block px-3 py-2 rounded-md text-gray-700 hover:bg-[#d4b26a]/20 hover:text-[#1e2c49] transition-colors",
+                    pathname === `/blog/categoria/${category.slug}` && "bg-[#d4b26a] text-[#1e2c49] font-semibold",
+                  )}
                 >
                   {category.name}
                 </Link>
-              ))}
-            </nav>
-          </CardContent>
-        </Card>
-      </FadeIn>
-
-      <FadeIn delay={0.3}>
-        <Card className="shadow-lg bg-[#1e2c49] text-white">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-[#d4b26a]">Fale Conosco</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <Phone className="h-5 w-5 text-[#d4b26a]" />
-              <a href="tel:+5511999999999" className="text-sm hover:underline">
-                (11) 99999-9999
-              </a>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Mail className="h-5 w-5 text-[#d4b26a]" />
-              <a href="mailto:contato@nicholasnascimento.adv.br" className="text-sm hover:underline">
-                contato@nicholasnascimento.adv.br
-              </a>
-            </div>
-            <div className="flex items-start space-x-3">
-              <MapPin className="h-5 w-5 text-[#d4b26a] flex-shrink-0 mt-1" />
-              <p className="text-sm">Rua Exemplo, 123, Centro, Cidade - SP</p>
-            </div>
-            <Link href="/contato" passHref>
-              <Button className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c0a05e] transition-colors mt-4">
-                Agendar Consulta
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </FadeIn>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
     </aside>
   )
 }

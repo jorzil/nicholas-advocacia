@@ -1,141 +1,129 @@
+import Image from "next/image"
+import { Calendar, User, Clock } from "lucide-react"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { SocialShare } from "@/components/social-share"
+import { CtaButton } from "@/components/cta-button"
 import { BlogSidebar } from "@/components/blog-sidebar"
-import { WhatsAppButton } from "@/components/whatsapp-button"
-import { Footer } from "@/components/footer"
-import { FadeIn } from "@/components/fade-in"
+import { calculateReadTime, formatDate } from "@/lib/utils"
 
-export default function DireitoVizinhancaResolverConflitosPage() {
-  const breadcrumbItems = [
-    { label: "Blog", href: "/blog" },
-    { label: "Direito de Vizinhança: Como Resolver Conflitos", href: "/blog/direito-vizinhanca-resolver-conflitos" },
-  ]
+export const metadata = {
+  title: "Direito de Vizinhança: Como Resolver Conflitos Comuns - Nicholas Advocacia",
+  description:
+    "Conheça o Direito de Vizinhança e as melhores formas de resolver conflitos com seus vizinhos de forma pacífica e legal.",
+  keywords: "direito de vizinhança, conflitos vizinhos, barulho, obras, limites, advogado imobiliário, mediação",
+  openGraph: {
+    title: "Direito de Vizinhança: Como Resolver Conflitos Comuns - Nicholas Advocacia",
+    description:
+      "Conheça o Direito de Vizinhança e as melhores formas de resolver conflitos com seus vizinhos de forma pacífica e legal.",
+    url: "https://www.nicholasadvocacia.com.br/blog/direito-vizinhanca-resolver-conflitos",
+    images: ["/blog-direito-vizinhanca.png"],
+  },
+}
 
-  const articleTitle = "Direito de Vizinhança: Como Resolver Conflitos e Manter a Harmonia"
-  const articleUrl = `${process.env.NEXT_PUBLIC_APP_URL}/blog/direito-vizinhanca-resolver-conflitos`
+export default function BlogPostPage() {
+  const post = {
+    title: "Direito de Vizinhança: Como Resolver Conflitos Comuns",
+    author: "Nicholas Nascimento",
+    publishedAt: "2023-02-10T10:00:00Z",
+    featuredImage: "/blog-direito-vizinhanca.png",
+    content: `
+      <h2>Introdução</h2>
+      <p>A convivência em sociedade, especialmente em áreas urbanas, muitas vezes gera conflitos entre vizinhos. O Direito de Vizinhança é o ramo do Direito Civil que regula as relações entre proprietários de imóveis vizinhos, buscando a harmonia e o equilíbrio. Conhecer seus direitos e deveres é essencial para resolver disputas de forma pacífica e legal.</p>
+      <h2>Principais Conflitos de Vizinhança</h2>
+      <p>Os problemas mais comuns entre vizinhos incluem:</p>
+      <ul>
+        <li><strong>Uso Nocivo da Propriedade:</strong> Barulho excessivo (festas, obras), fumaça, odores, vibrações que perturbam o sossego e a saúde dos vizinhos.</li>
+        <li><strong>Árvores Limítrofes:</strong> Questões sobre galhos e raízes que invadem a propriedade vizinha, frutos caídos, e responsabilidade pela poda.</li>
+        <li><strong>Passagem Forçada e Servidão de Passagem:</strong> Direito de acesso a imóvel encravado (sem saída para via pública) e uso de passagem por propriedade alheia.</li>
+        <li><strong>Águas:</strong> Problemas com escoamento de água da chuva, infiltrações, e uso de águas comuns.</li>
+        <li><strong>Limites entre Imóveis e Direito de Construir:</strong> Disputas sobre demarcação de limites, construção de muros, janelas e aberturas, e direito de construir até o limite da propriedade.</li>
+      </ul>
+      <h2>Como Resolver Conflitos de Vizinhança</h2>
+      <p>A melhor forma de resolver um conflito de vizinhança é sempre buscar o diálogo e a conciliação. Se o diálogo não for suficiente, algumas etapas podem ser seguidas:</p>
+      <ol>
+        <li><strong>Notificação Extrajudicial:</strong> Enviar uma notificação formal ao vizinho, com a ajuda de um advogado, expondo o problema e buscando uma solução amigável.</li>
+        <li><strong>Mediação ou Conciliação:</strong> Buscar um mediador ou conciliador (pode ser um profissional particular ou um órgão público, como o Centro Judiciário de Solução de Conflitos e Cidadania - CEJUSC) para auxiliar na negociação.</li>
+        <li><strong>Ação Judicial:</strong> Em último caso, se as tentativas amigáveis falharem, é possível ingressar com uma ação judicial para resolver o conflito. As ações mais comuns são as de dano infecto, nunciação de obra nova, ou ações possessórias.</li>
+      </ol>
+      <h2>Conclusão</h2>
+      <p>O Direito de Vizinhança visa garantir que o uso da propriedade de um não prejudique o sossego, a segurança e a saúde do outro. Em caso de conflitos, a Nicholas Advocacia oferece assessoria jurídica especializada para ajudar você a encontrar a melhor solução, seja por meio do diálogo, mediação ou, se necessário, pela via judicial, protegendo seus direitos e promovendo a boa convivência.</p>
+    `,
+  }
+
+  const readTime = calculateReadTime(post.content)
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1">
-        <section
-          className="relative w-full h-[300px] bg-cover bg-center"
-          style={{ backgroundImage: "url('/blog-direito-vizinhanca.png')" }}
-        >
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <FadeIn>
-              <h1 className="text-4xl font-bold text-white text-center px-4">{articleTitle}</h1>
-            </FadeIn>
-          </div>
-        </section>
-
-        <section className="py-8 md:py-12 bg-gray-50">
-          <div className="container px-4 md:px-6">
-            <Breadcrumb items={breadcrumbItems} />
-            <div className="flex flex-col lg:flex-row gap-12 mt-8">
-              <div className="lg:w-2/3 space-y-8">
-                <FadeIn>
-                  <div className="prose prose-lg max-w-none text-gray-700">
-                    <p>
-                      A convivência em sociedade, especialmente entre vizinhos, pode gerar atritos e conflitos. O
-                      Direito de Vizinhança é o ramo do Direito Civil que estabelece as regras para o uso da
-                      propriedade, buscando harmonizar os interesses dos proprietários de imóveis contíguos e prevenir
-                      desavenças. Conhecer seus direitos e deveres é fundamental para uma boa convivência.
-                    </p>
-
-                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Principais Conflitos de Vizinhança</h2>
-                    <p>Os problemas mais comuns entre vizinhos incluem:</p>
-                    <ul className="list-disc list-inside">
-                      <li>
-                        <strong>Uso Nocivo da Propriedade:</strong> Barulho excessivo (festas, obras, animais), fumaça,
-                        odores, vibrações que perturbam o sossego e a saúde dos vizinhos.
-                      </li>
-                      <li>
-                        <strong>Árvores e Frutos:</strong> Galhos que invadem a propriedade vizinha, raízes que
-                        danificam muros ou calçadas, frutos que caem no terreno alheio.
-                      </li>
-                      <li>
-                        <strong>Passagem Forçada e Servidão:</strong> Questões relacionadas ao acesso a imóveis
-                        encravados (sem saída para via pública) ou à passagem de tubulações e fiações.
-                      </li>
-                      <li>
-                        <strong>Limites entre Imóveis:</strong> Disputas sobre a demarcação de divisas, construção de
-                        muros e cercas.
-                      </li>
-                      <li>
-                        <strong>Direito de Construir:</strong> Respeito às regras de recuo, altura, ventilação e
-                        iluminação nas construções.
-                      </li>
-                      <li>
-                        <strong>Águas:</strong> Escoamento de águas pluviais ou servidas que causem danos ao vizinho.
-                      </li>
-                    </ul>
-
-                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Como Resolver Conflitos</h2>
-                    <p>
-                      A melhor abordagem para resolver conflitos de vizinhança é sempre buscar uma solução amigável
-                      antes de recorrer à via judicial:
-                    </p>
-                    <ol className="list-decimal list-inside">
-                      <li>
-                        <strong>Diálogo:</strong> Tente conversar com o vizinho de forma calma e educada, expondo o
-                        problema e buscando um acordo. Muitas vezes, o vizinho nem percebe que está causando incômodo.
-                      </li>
-                      <li>
-                        <strong>Notificação Extrajudicial:</strong> Se o diálogo não funcionar, uma notificação formal
-                        (por carta com aviso de recebimento ou por meio de um advogado) pode demonstrar a seriedade da
-                        situação e incentivar uma solução.
-                      </li>
-                      <li>
-                        <strong>Mediação/Conciliação:</strong> Buscar um mediador (profissional ou órgão como o Centro
-                        Judiciário de Solução de Conflitos e Cidadania - CEJUSC) pode ajudar as partes a chegarem a um
-                        acordo mutuamente satisfatório.
-                      </li>
-                      <li>
-                        <strong>Ação Judicial:</strong> Como último recurso, é possível ingressar com uma ação judicial
-                        (ação de dano infecto, ação de obrigação de fazer/não fazer, ação de indenização) para que o
-                        Poder Judiciário determine a solução.
-                      </li>
-                    </ol>
-
-                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">
-                      A Importância da Assessoria Jurídica
-                    </h2>
-                    <p>
-                      Um advogado especialista em Direito Imobiliário e de Vizinhança pode ser crucial em todas as
-                      etapas:
-                    </p>
-                    <ul className="list-disc list-inside">
-                      <li>Orientar sobre seus direitos e deveres.</li>
-                      <li>Analisar a situação e as provas (fotos, vídeos, testemunhas).</li>
-                      <li>Elaborar notificações e acordos.</li>
-                      <li>Representar você em mediações ou processos judiciais.</li>
-                      <li>Buscar a solução mais rápida e eficaz para o seu problema.</li>
-                    </ul>
-
-                    <h2 className="text-2xl font-bold text-[#1e2c49] mt-8 mb-4">Conclusão</h2>
-                    <p>
-                      Conflitos de vizinhança podem ser desgastantes, mas não precisam se tornar uma guerra. Com
-                      conhecimento das leis e a abordagem correta, é possível resolver as desavenças e restabelecer a
-                      harmonia. Não hesite em buscar ajuda profissional para proteger seu direito ao sossego e à
-                      propriedade.
-                    </p>
-                  </div>
-                </FadeIn>
-                <div className="mt-8">
-                  <h3 className="text-xl font-bold text-[#1e2c49] mb-4">Compartilhe este artigo:</h3>
-                  <SocialShare title={articleTitle} url={articleUrl} />
-                </div>
-              </div>
-
-              <div className="lg:w-1/3">
-                <BlogSidebar />
-              </div>
+    <div className="flex min-h-screen flex-col">
+      {/* Hero Section */}
+      <section className="relative py-20 md:py-28 min-h-[300px] flex items-center">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={post.featuredImage || "/placeholder.svg"}
+            alt={post.title}
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/60"></div>
+        </div>
+        <div className="container relative z-10 mx-auto px-4 lg:px-6 text-white">
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Blog", href: "/blog" },
+              { label: "Direito de Vizinhança", href: "/blog/direito-vizinhanca-resolver-conflitos" },
+            ]}
+          />
+          <h1 className="mt-6 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">{post.title}</h1>
+          <div className="mt-4 flex items-center gap-4 text-lg text-gray-200">
+            <div className="flex items-center">
+              <User className="mr-2 h-5 w-5" />
+              <span>{post.author}</span>
+            </div>
+            <div className="flex items-center">
+              <Calendar className="mr-2 h-5 w-5" />
+              <span>{formatDate(post.publishedAt)}</span>
+            </div>
+            <div className="flex items-center">
+              <Clock className="mr-2 h-5 w-5" />
+              <span>{readTime}</span>
             </div>
           </div>
-        </section>
-      </main>
-      <WhatsAppButton />
-      <Footer />
+        </div>
+      </section>
+
+      {/* Main Content Section */}
+      <section className="bg-white py-16">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+            {/* Blog Post Content */}
+            <div className="lg:col-span-3">
+              <article className="prose prose-lg max-w-none text-gray-700">
+                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              </article>
+
+              {/* Share Buttons */}
+              <div className="mt-12 border-t border-gray-200 pt-8">
+                <h3 className="text-xl font-bold text-[#1e2c49] mb-4">Compartilhe este artigo:</h3>
+                <SocialShare
+                  title={post.title}
+                  url={`https://www.nicholasadvocacia.com.br/blog/${post.title.toLowerCase().replace(/\s+/g, "-")}`}
+                />
+              </div>
+
+              {/* CTA Button */}
+              <div className="mt-12">
+                <CtaButton />
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <BlogSidebar />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

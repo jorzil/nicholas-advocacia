@@ -3,43 +3,30 @@
 import type React from "react"
 
 import { useState } from "react"
+import { UploadCloud, Loader2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { UploadCloudIcon, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface ImageUploadProps {
-  onUploadComplete: (url: string) => void
-  initialImageUrl?: string
+  value: string
+  onChange: (url: string) => void
+  folder?: string // Optional folder to organize uploads
 }
 
-export function ImageUpload({ onUploadComplete, initialImageUrl }: ImageUploadProps) {
-  const [file, setFile] = useState<File | null>(null)
-  const [loading, setLoading] = useState(false)
+export function ImageUpload({ value, onChange, folder = "general" }: ImageUploadProps) {
+  const [isUploading, setIsUploading] = useState(false)
   const { toast } = useToast()
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
-    } else {
-      setFile(null)
-    }
-  }
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
 
-  const handleUpload = async () => {
-    if (!file) {
-      toast({
-        title: "Erro",
-        description: "Por favor, selecione um arquivo para upload.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    setLoading(true)
+    setIsUploading(true)
     const formData = new FormData()
     formData.append("file", file)
+    formData.append("folder", folder) // Append folder name
 
     try {
       const response = await fetch("/api/upload", {
@@ -47,60 +34,82 @@ export function ImageUpload({ onUploadComplete, initialImageUrl }: ImageUploadPr
         body: formData,
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        onUploadComplete(data.url)
+      const result = await response.json()
+
+      if (response.ok && result.url) {
+        onChange(result.url)
         toast({
-          title: "Sucesso!",
-          description: "Imagem enviada com sucesso.",
+          title: "Upload Concluído",
+          description: "Imagem enviada com sucesso!",
         })
-        setFile(null) // Clear the selected file after successful upload
       } else {
-        const errorData = await response.json()
-        toast({
-          title: "Erro no Upload",
-          description: errorData.error || "Falha ao enviar a imagem.",
-          variant: "destructive",
-        })
+        throw new Error(result.message || "Falha no upload da imagem.")
       }
-    } catch (error) {
-      console.error("Erro ao enviar imagem:", error)
+    } catch (error: any) {
+      console.error("Erro no upload:", error)
       toast({
-        title: "Erro",
-        description: "Ocorreu um erro de rede ao enviar a imagem.",
+        title: "Erro no Upload",
+        description: error.message || "Não foi possível enviar a imagem. Tente novamente.",
         variant: "destructive",
       })
     } finally {
-      setLoading(false)
+      setIsUploading(false)
+      // Clear the input field to allow re-uploading the same file if needed
+      event.target.value = ""
     }
+  }
+
+  const handleRemoveImage = () => {
+    onChange("")
+    toast({
+      title: "Imagem Removida",
+      description: "A imagem destacada foi removida.",
+    })
   }
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="image-upload">Upload de Imagem</Label>
-      <div className="flex items-center space-x-2">
-        <Input id="image-upload" type="file" accept="image/*" onChange={handleFileChange} />
-        <Button onClick={handleUpload} disabled={loading || !file}>
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando...
-            </>
+      {value ? (
+        <div className="relative w-full h-48 rounded-md overflow-hidden border border-gray-200 flex items-center justify-center">
+          <img src={value || "/placeholder.svg"} alt="Uploaded image" className="object-contain w-full h-full" />
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon"
+            className="absolute top-2 right-2 rounded-full"
+            onClick={handleRemoveImage}
+            aria-label="Remover imagem"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <Label
+          htmlFor="image-upload"
+          className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-md cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
+        >
+          {isUploading ? (
+            <div className="flex flex-col items-center">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+              <span className="mt-2 text-gray-600">Enviando...</span>
+            </div>
           ) : (
-            <>
-              <UploadCloudIcon className="mr-2 h-4 w-4" /> Upload
-            </>
+            <div className="flex flex-col items-center">
+              <UploadCloud className="h-10 w-10 text-gray-400" />
+              <span className="mt-2 text-gray-600">Arraste e solte ou clique para enviar</span>
+              <span className="text-sm text-gray-500">Max 5MB (JPG, PNG, GIF)</span>
+            </div>
           )}
-        </Button>
-      </div>
-      {initialImageUrl && !file && (
-        <p className="text-sm text-gray-500">
-          URL da imagem atual:{" "}
-          <a href={initialImageUrl} target="_blank" rel="noopener noreferrer" className="underline">
-            {initialImageUrl}
-          </a>
-        </p>
+          <Input
+            id="image-upload"
+            type="file"
+            className="hidden"
+            onChange={handleFileChange}
+            accept="image/jpeg,image/png,image/gif"
+            disabled={isUploading}
+          />
+        </Label>
       )}
-      {file && <p className="text-sm text-gray-500">Arquivo selecionado: {file.name}</p>}
     </div>
   )
 }

@@ -1,44 +1,84 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useInView } from "react-intersection-observer"
+import { useEffect, useState, useRef } from "react"
 
 interface CounterAnimationProps {
   end: number
+  start?: number
   duration?: number
+  delay?: number
   prefix?: string
   suffix?: string
+  className?: string
 }
 
-export function CounterAnimation({ end, duration = 2000, prefix = "", suffix = "" }: CounterAnimationProps) {
-  const [count, setCount] = useState(0)
-  const { ref, inView } = useInView({
-    triggerOnce: true, // Only trigger once when it comes into view
-    threshold: 0.5, // Trigger when 50% of the component is visible
-  })
+export function CounterAnimation({
+  end,
+  start = 0,
+  duration = 2000,
+  delay = 0,
+  prefix = "",
+  suffix = "",
+  className = "text-3xl font-bold text-[#d4b26a] md:text-4xl",
+}: CounterAnimationProps) {
+  const [count, setCount] = useState(start)
+  const countRef = useRef<HTMLDivElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+  const hasAnimated = useRef(false)
 
   useEffect(() => {
-    if (!inView) {
-      return
-    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.1 },
+    )
 
-    let startTimestamp: DOMHighResTimeStamp | null = null
-    const step = (timestamp: DOMHighResTimeStamp) => {
-      if (!startTimestamp) startTimestamp = timestamp
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1)
-      setCount(Math.floor(progress * end))
-      if (progress < 1) {
-        window.requestAnimationFrame(step)
-      }
+    if (countRef.current) {
+      observer.observe(countRef.current)
     }
-
-    window.requestAnimationFrame(step)
 
     return () => {
-      // Cleanup if component unmounts before animation finishes
-      setCount(0) // Reset count on unmount or if not in view
+      if (countRef.current) {
+        observer.unobserve(countRef.current)
+      }
     }
-  }, [end, duration, inView])
+  }, [])
 
-  return <span ref={ref}>{`${prefix}${count.toLocaleString()}${suffix}`}</span>
+  useEffect(() => {
+    if (isVisible && !hasAnimated.current) {
+      hasAnimated.current = true
+
+      const startTime = Date.now() + delay
+      const endTime = startTime + duration
+
+      const timer = setInterval(() => {
+        const now = Date.now()
+
+        if (now < startTime) return
+
+        if (now >= endTime) {
+          setCount(end)
+          clearInterval(timer)
+          return
+        }
+
+        const elapsed = now - startTime
+        const progress = elapsed / duration
+        setCount(Math.floor(start + progress * (end - start)))
+      }, 16)
+
+      return () => clearInterval(timer)
+    }
+  }, [isVisible, start, end, duration, delay])
+
+  return (
+    <div ref={countRef} className={className}>
+      {prefix}
+      {count}
+      {suffix}
+    </div>
+  )
 }

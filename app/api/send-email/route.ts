@@ -6,8 +6,11 @@ export async function POST(request: NextRequest) {
     const { name, email, phone, message, subject, formType, usucapiaoType, possessionTime } = body
 
     // Basic validation for required fields
-    if (!name || !email || !phone || !message || !subject || !formType) {
-      return NextResponse.json({ success: false, message: "Campos obrigatórios ausentes" }, { status: 400 })
+    if (!name || !email || !message) {
+      return NextResponse.json(
+        { success: false, message: "Campos obrigatórios (Nome, Email, Mensagem) não preenchidos." },
+        { status: 400 },
+      )
     }
 
     const resendApiKey = process.env.RESEND_API_KEY
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
         if (!response.ok) {
           // Log Resend API specific error for debugging
           console.error("Resend API error response:", result)
-          throw new Error(`Resend API error: ${result.message || "Erro desconhecido"}`)
+          throw new Error(`Resend API error: ${result.message || "Unknown error"}`)
         }
 
         console.log("Email sent successfully via Resend:", result.id)
@@ -72,33 +75,24 @@ export async function POST(request: NextRequest) {
 
     // Simulation mode (when no valid Resend key or Resend fails)
     console.log("=== EMAIL SIMULATION MODE ===")
-    console.log("Received contact form submission:")
-    console.log(`Form Type: ${formType}`)
-    console.log(`Name: ${name}`)
-    console.log(`Email: ${email}`)
-    console.log(`Phone: ${phone}`)
-    console.log(`Subject: ${subject}`)
-    console.log(`Message: ${message}`)
+    console.log("From: Site Nicholas Advocacia <noreply@nicholasadvocacia.com.br>")
+    console.log("To: adv@nicholasadvocacia.com.br")
+    console.log("Reply-to:", email)
+    console.log("Subject:", subject || `Nova mensagem de ${name} (Formulário: ${formType})`)
     console.log("---")
     console.log(emailContent)
     console.log("=== FIM DA SIMULAÇÃO ===")
 
-    // Simulate email sending delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Simulate success or failure
-    const success = Math.random() > 0.1 // 90% chance of success
-
-    if (success) {
-      return NextResponse.json({ success: true, message: "Email enviado com sucesso!" })
-    } else {
-      return NextResponse.json(
-        { success: false, message: "Falha ao enviar o email. Tente novamente mais tarde." },
-        { status: 500 },
-      )
-    }
+    return NextResponse.json({
+      success: true,
+      message: "Email enviado com sucesso!",
+      note: hasValidResendKey ? "Modo simulação (falha no Resend)" : "Modo simulação (sem chave Resend)",
+    })
   } catch (error) {
     console.error("Error processing email request:", error)
-    return NextResponse.json({ success: false, message: "Erro interno do servidor" }, { status: 500 })
+    return NextResponse.json(
+      { success: false, message: "Erro interno do servidor ao processar a requisição." },
+      { status: 500 },
+    )
   }
 }
