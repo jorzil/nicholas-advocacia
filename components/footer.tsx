@@ -1,138 +1,172 @@
-import NextImage from "next/image"
 import Link from "next/link"
-import { Phone, Mail, Clock } from "lucide-react"
+import NextImage from "next/image"
+import { Phone, Mail, Facebook, Instagram, Linkedin } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-[#1e2c49] text-white">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
-          {/* Logo and Description */}
-          <div className="md:col-span-1">
-            <div className="flex items-center space-x-3 mb-4">
+    <footer className="bg-[#1e2c49] text-white py-12">
+      <div className="container mx-auto px-4 lg:px-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {/* Brand Info */}
+        <div className="space-y-4">
+          <Link href="/" className="flex items-center">
+            <div className="h-16 w-32 relative">
               <NextImage
                 src="/logo-nicholas-nascimento.png"
                 alt="Nicholas Nascimento Advocacia"
-                width={40}
-                height={40}
-                className="rounded-full"
+                fill
+                className="object-contain"
               />
-              <div>
-                <h3 className="font-bold text-lg">Nicholas Nascimento</h3>
-                <p className="text-sm text-blue-200">Advocacia</p>
-              </div>
             </div>
-            <p className="text-blue-100 text-sm leading-relaxed">
-              Especialistas em direito imobiliário e civil, oferecendo soluções jurídicas personalizadas com excelência
-              e dedicação.
-            </p>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Serviços</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/servicos/usucapiao" className="text-blue-100 hover:text-white transition-colors">
-                  Usucapião
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/servicos/regularizacao-imoveis"
-                  className="text-blue-100 hover:text-white transition-colors"
-                >
-                  Regularização de Imóveis
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/servicos/contratos-imobiliarios"
-                  className="text-blue-100 hover:text-white transition-colors"
-                >
-                  Contratos Imobiliários
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/servicos/litigios-imobiliarios"
-                  className="text-blue-100 hover:text-white transition-colors"
-                >
-                  Litígios Imobiliários
-                </Link>
-              </li>
-              <li>
-                <Link href="/servicos/direito-condominial" className="text-blue-100 hover:text-white transition-colors">
-                  Direito Condominial
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Links Rápidos</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/sobre" className="text-blue-100 hover:text-white transition-colors">
-                  Sobre Nós
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="text-blue-100 hover:text-white transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/contato" className="text-blue-100 hover:text-white transition-colors">
-                  Contato
-                </Link>
-              </li>
-              <li>
-                <Link href="/servicos" className="text-blue-100 hover:text-white transition-colors">
-                  Todos os Serviços
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div>
-            <h4 className="font-semibold text-lg mb-4">Contato</h4>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-blue-300" />
-                <span className="text-blue-100">(33) 99999-9999</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Mail className="h-4 w-4 text-blue-300" />
-                <span className="text-blue-100">contato@nicholasnascimento.adv.br</span>
-              </div>
-              <div className="flex items-start space-x-2">
-                <Clock className="h-4 w-4 text-blue-300 mt-0.5" />
-                <div className="text-blue-100">
-                  <p>Seg-Sex: 8h às 18h</p>
-                  <p>Sáb: 8h às 12h</p>
-                </div>
-              </div>
-            </div>
+          </Link>
+          <p className="text-gray-300 text-sm">
+            Advocacia especializada em Direito Imobiliário, com atendimento online em todo o Brasil.
+          </p>
+          <div className="flex space-x-4">
+            <Link
+              href="https://www.facebook.com/nicholasadvocacia"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+            >
+              <Facebook className="h-6 w-6 text-gray-300 hover:text-[#d4b26a] transition-colors" />
+            </Link>
+            <Link
+              href="https://www.instagram.com/nicholasadvocacia"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <Instagram className="h-6 w-6 text-gray-300 hover:text-[#d4b26a] transition-colors" />
+            </Link>
+            <Link
+              href="https://www.linkedin.com/company/nicholas-advocacia"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="h-6 w-6 text-gray-300 hover:text-[#d4b26a] transition-colors" />
+            </Link>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-blue-800 mt-8 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-blue-200">
-            <p>© {new Date().getFullYear()} Nicholas Nascimento Advocacia. Todos os direitos reservados.</p>
-            <div className="flex space-x-4 mt-4 md:mt-0">
-              <Link href="/politica-privacidade" className="hover:text-white transition-colors">
-                Política de Privacidade
+        {/* Quick Links */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4 text-[#d4b26a]">Links Rápidos</h3>
+          <ul className="space-y-2">
+            <li>
+              <Link href="/" className="text-gray-300 hover:text-[#d4b26a] transition-colors">
+                Home
               </Link>
-              <Link href="/termos-uso" className="hover:text-white transition-colors">
-                Termos de Uso
+            </li>
+            <li>
+              <Link href="/sobre" className="text-gray-300 hover:text-[#d4b26a] transition-colors">
+                Sobre
               </Link>
-            </div>
-          </div>
+            </li>
+            <li>
+              <Link href="/servicos" className="text-gray-300 hover:text-[#d4b26a] transition-colors">
+                Serviços
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog" className="text-gray-300 hover:text-[#d4b26a] transition-colors">
+                Blog
+              </Link>
+            </li>
+            <li>
+              <Link href="/contato" className="text-gray-300 hover:text-[#d4b26a] transition-colors">
+                Contato
+              </Link>
+            </li>
+          </ul>
         </div>
+
+        {/* Services */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4 text-[#d4b26a]">Nossos Serviços</h3>
+          <ul className="space-y-2">
+            <li>
+              <Link href="/servicos/usucapiao" className="text-gray-300 hover:text-[#d4b26a] transition-colors">
+                Usucapião
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/servicos/regularizacao-imoveis"
+                className="text-gray-300 hover:text-[#d4b26a] transition-colors"
+              >
+                Regularização de Imóveis
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/servicos/contratos-imobiliarios"
+                className="text-gray-300 hover:text-[#d4b26a] transition-colors"
+              >
+                Contratos Imobiliários
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/servicos/litigios-imobiliarios"
+                className="text-gray-300 hover:text-[#d4b26a] transition-colors"
+              >
+                Litígios Imobiliários
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/servicos/incorporacao-imobiliaria"
+                className="text-gray-300 hover:text-[#d4b26a] transition-colors"
+              >
+                Incorporação Imobiliária
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/servicos/direito-condominial"
+                className="text-gray-300 hover:text-[#d4b26a] transition-colors"
+              >
+                Direito Condominial
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Contact Info */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4 text-[#d4b26a]">Contato</h3>
+          <ul className="space-y-2">
+            <li className="flex items-center gap-2">
+              <Phone className="h-5 w-5 text-gray-300" />
+              <a href="tel:+55339933009228" className="text-gray-300 hover:text-[#d4b26a] transition-colors">
+                (33) 99330-09228
+              </a>
+            </li>
+            <li className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-gray-300" />
+              <a
+                href="mailto:adv@nicholasadvocacia.com.br"
+                className="text-gray-300 hover:text-[#d4b26a] transition-colors"
+              >
+                adv@nicholasadvocacia.com.br
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
+        <p>&copy; {new Date().getFullYear()} Nicholas Nascimento Advocacia. Todos os direitos reservados.</p>
+        <p>
+          <Link href="/politica-de-privacidade" className="hover:underline">
+            Política de Privacidade
+          </Link>{" "}
+          |{" "}
+          <Link href="/termos-de-uso" className="hover:underline">
+            Termos de Uso
+          </Link>
+        </p>
       </div>
     </footer>
   )

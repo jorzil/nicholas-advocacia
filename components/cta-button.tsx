@@ -1,45 +1,29 @@
 "use client"
-
-import type React from "react"
-
-import NextImage from "next/image"
 import Link from "next/link"
+import NextImage from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Phone } from "lucide-react"
+import { Phone } from "lucide-react"
 
 interface CTAButtonProps {
-  href?: string
-  children: React.ReactNode
-  variant?: "default" | "outline" | "secondary"
-  size?: "default" | "sm" | "lg"
-  className?: string
-  onClick?: () => void
+  text: string
+  href: string
+  whatsapp?: boolean
 }
 
-export function CTAButton({
-  href,
-  children,
-  variant = "default",
-  size = "default",
-  className = "",
-  onClick,
-}: CTAButtonProps) {
-  const buttonContent = (
-    <Button variant={variant} size={size} className={`group ${className}`} onClick={onClick}>
-      {children}
-      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-    </Button>
+export function CTAButton({ text, href, whatsapp = false }: CTAButtonProps) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center justify-center gap-2 rounded-md bg-[#d4b26a] px-6 py-3 font-medium text-[#1e2c49] transition-colors hover:bg-[#c4a25a]"
+    >
+      {text}
+      {whatsapp && <NextImage src="/whatsapp-icon.png" alt="WhatsApp" width={20} height={20} />}
+    </Link>
   )
-
-  if (href) {
-    return <Link href={href}>{buttonContent}</Link>
-  }
-
-  return buttonContent
 }
 
 // Named export for compatibility
-export const CtaButton = CTAButton
+export { CTAButton as CtaButton }
 
 // WhatsApp CTA Button
 interface WhatsAppCTAProps {
