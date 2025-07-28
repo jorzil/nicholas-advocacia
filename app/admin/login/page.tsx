@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/hooks/use-auth" // Import useAuth
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -16,45 +17,24 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+  const { login } = useAuth() // Get the login function from AuthContext
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    try {
-      const response = await fetch("/api/admin/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      })
+    const success = await login(username, password) // Use the login function from context
 
-      const data = await response.json()
-
-      if (response.ok) {
-        toast({
-          title: "Login bem-sucedido",
-          description: "Redirecionando para o painel de administração...",
-        })
-        router.push("/admin/blog") // Redirect to the admin dashboard
-      } else {
-        toast({
-          title: "Erro de Login",
-          description: data.message || "Credenciais inválidas. Tente novamente.",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      console.error("Erro ao fazer login:", error)
+    if (success) {
       toast({
-        title: "Erro de Rede",
-        description: "Não foi possível conectar ao servidor. Verifique sua conexão.",
-        variant: "destructive",
+        title: "Login bem-sucedido",
+        description: "Redirecionando para o painel de administração...",
       })
-    } finally {
-      setIsLoading(false)
+      router.push("/admin/blog") // Redirect to the admin dashboard
+    } else {
+      // Error toast is handled by the login function in auth-context
     }
+    setIsLoading(false)
   }
 
   return (

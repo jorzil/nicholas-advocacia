@@ -1,222 +1,240 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 import { format } from "date-fns"
-import { CalendarIcon, Save, Loader2 } from "lucide-react"
+import { CalendarIcon, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { ImageUpload } from "@/components/image-upload"
+import { Badge } from "@/components/ui/badge"
+
+const formSchema = z.object({
+  title: z.string().min(5, "O título deve ter pelo menos 5 caracteres."),
+  slug: z
+    .string()
+    .min(5, "O slug deve ter pelo menos 5 caracteres.")
+    .regex(/^[a-z0-9-]+$/, "O slug deve conter apenas letras minúsculas, números e hífens."),
+  content: z.string().min(50, "O conteúdo deve ter pelo menos 50 caracteres."),
+  author: z.string().min(3, "O autor deve ter pelo menos 3 caracteres."),
+  publishedAt: z.date({ required_error: "A data de publicação é obrigatória." }),
+  status: z.enum(["published", "draft"]),
+  tags: z.array(z.string()).min(1, "Selecione pelo menos uma tag."),
+  featuredImage: z.string().optional(),
+})
+
+type BlogPostFormValues = z.infer<typeof formSchema>
 
 interface BlogPostFormProps {
-  initialData?: {
-    id?: string
-    title: string
-    slug: string
-    content: string
-    author: string
-    publishedAt: string
-    status: "published" | "draft"
-    tags: string[]
-    featuredImage?: string
-  }
+  initialData?: BlogPostFormValues & { id?: string }
 }
 
 export function BlogPostForm({ initialData }: BlogPostFormProps) {
-  const [title, setTitle] = useState(initialData?.title || "")
-  const [slug, setSlug] = useState(initialData?.slug || "")
-  const [content, setContent] = useState(initialData?.content || "")
-  const [author, setAuthor] = useState(initialData?.author || "")
-  const [publishedAt, setPublishedAt] = useState<Date | undefined>(
-    initialData?.publishedAt ? new Date(initialData.publishedAt) : undefined,
-  )
-  const [status, setStatus] = useState<"published" | "draft">(initialData?.status || "draft")
-  const [tags, setTags] = useState(initialData?.tags.join(", ") || "")
-  const [featuredImage, setFeaturedImage] = useState(initialData?.featuredImage || "")
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+  const [isPending, startTransition] = useTransition()
+  const [newTag, setNewTag] = useState("")
+
+  const form = useForm<BlogPostFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialData || {
+      title: "",
+      slug: "",
+      content: "",
+      author: "Nicholas Nascimento", // Default author
+      publishedAt: new Date(),
+      status: "draft",
+      tags: [],
+      featuredImage: "",
+    },
+  })
+
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = form
+  const watchedTags = watch("tags")
+  const watchedContent = watch("content")
+  const watchedFeaturedImage = watch("featuredImage")
 
   useEffect(() => {
-    if (title && !initialData?.slug) {
-      setSlug(
-        title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-*|-*$/g, ""),
-      )
+    if (initialData?.content) {
+      setValue("content", initialData.content, { shouldValidate: true })
     }
-  }, [title, initialData?.slug])
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    const postData = {
-      title,
-      slug,
-      content,
-      author,
-      publishedAt: publishedAt?.toISOString() || new Date().toISOString(),
-      status,
-      tags: tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-      featuredImage,
+    if (initialData?.featuredImage) {
+      setValue("featuredImage", initialData.featuredImage, { shouldValidate: true })
     }
+  }, [initialData, setValue])
 
-    const method = initialData?.id ? "PUT" : "POST"
-    const url = initialData?.id ? `/api/admin/blog/${initialData.id}` : "/api/admin/blog"
+  const onSubmit = async (values: BlogPostFormValues) => {
+    startTransition(async () => {
+      try {
+        const method = initialData?.id ? "PUT" : "POST"
+        const url = initialData?.id
+          ? `${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog/${initialData.id}`
+          : `${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog`
 
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postData),
-      })
+        const response = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        })
 
-      const result = await response.json()
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Erro ao salvar o post.")
+        }
 
-      if (!response.ok) {
-        throw new Error(result.message || "Failed to save post")
+        toast({
+          title: "Sucesso!",
+          description: `Post ${initialData?.id ? "atualizado" : "criado"} com sucesso.`,
+        })
+        router.push("/admin/blog")
+        router.refresh() // Revalidate data on the blog management page
+      } catch (error: any) {
+        toast({
+          title: "Erro",
+          description: error.message || "Ocorreu um erro ao salvar o post.",
+          variant: "destructive",
+        })
       }
+    })
+  }
 
-      toast({
-        title: "Sucesso!",
-        description: `Post ${initialData?.id ? "atualizado" : "criado"} com sucesso.`,
-      })
-      router.push("/admin/blog")
-      router.refresh() // Refresh the page to show updated list
-    } catch (e: any) {
-      toast({
-        title: "Erro ao salvar post",
-        description: e.message || "Ocorreu um erro ao salvar o post. Tente novamente.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
+  const handleAddTag = () => {
+    if (newTag && !watchedTags.includes(newTag)) {
+      setValue("tags", [...watchedTags, newTag])
+      setNewTag("")
     }
   }
 
+  const handleRemoveTag = (tagToRemove: string) => {
+    setValue(
+      "tags",
+      watchedTags.filter((tag) => tag !== tagToRemove),
+    )
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 p-6 bg-white rounded-lg shadow-md">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="title">Título do Post</Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Título do seu artigo"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="slug">Slug (URL amigável)</Label>
-          <Input
-            id="slug"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="titulo-do-seu-artigo"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="author">Autor</Label>
-        <Input
-          id="author"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          placeholder="Nome do autor"
-          required
-        />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="publishedAt">Data de Publicação</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn("w-full justify-start text-left font-normal", !publishedAt && "text-muted-foreground")}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {publishedAt ? format(publishedAt, "PPP") : <span>Escolha uma data</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar mode="single" selected={publishedAt} onSelect={setPublishedAt} initialFocus />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <Select value={status} onValueChange={(value: "published" | "draft") => setStatus(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione o status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="draft">Rascunho</SelectItem>
-              <SelectItem value="published">Publicado</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
-        <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="tag1, tag2, tag3" />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="featuredImage">Imagem Destacada</Label>
-        <ImageUpload
-          value={featuredImage}
-          onChange={setFeaturedImage}
-          folder="blog-images" // Specify a folder for blog images
-        />
-        {featuredImage && (
-          <div className="mt-2 relative w-48 h-32 rounded-md overflow-hidden">
-            <img
-              src={featuredImage || "/placeholder.svg"}
-              alt="Imagem Destacada"
-              className="object-cover w-full h-full"
-            />
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="title">Título</Label>
+            <Input id="title" {...register("title")} />
+            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
           </div>
-        )}
+          <div>
+            <Label htmlFor="slug">Slug</Label>
+            <Input id="slug" {...register("slug")} />
+            {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="author">Autor</Label>
+            <Input id="author" {...register("author")} />
+            {errors.author && <p className="text-red-500 text-sm mt-1">{errors.author.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="publishedAt">Data de Publicação</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !watch("publishedAt") && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {watch("publishedAt") ? format(watch("publishedAt"), "PPP") : <span>Escolha uma data</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={watch("publishedAt")}
+                  onSelect={(date) => setValue("publishedAt", date!)}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            {errors.publishedAt && <p className="text-red-500 text-sm mt-1">{errors.publishedAt.message}</p>}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="status"
+              checked={watch("status") === "published"}
+              onCheckedChange={(checked) => setValue("status", checked ? "published" : "draft")}
+            />
+            <Label htmlFor="status">Publicar Post</Label>
+          </div>
+          <div>
+            <Label htmlFor="tags">Tags</Label>
+            <div className="flex gap-2 mb-2">
+              <Input
+                id="newTag"
+                placeholder="Adicionar nova tag"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    handleAddTag()
+                  }
+                }}
+              />
+              <Button type="button" onClick={handleAddTag}>
+                Adicionar
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {watchedTags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                  {tag}
+                  <button type="button" onClick={() => handleRemoveTag(tag)} className="ml-1 text-xs">
+                    &times;
+                  </button>
+                </Badge>
+              ))}
+            </div>
+            {errors.tags && <p className="text-red-500 text-sm mt-1">{errors.tags.message}</p>}
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="featuredImage">Imagem Destacada</Label>
+            <ImageUpload value={watchedFeaturedImage} onChange={(url) => setValue("featuredImage", url)} />
+            {errors.featuredImage && <p className="text-red-500 text-sm mt-1">{errors.featuredImage.message}</p>}
+          </div>
+        </div>
       </div>
-
-      <div className="space-y-2">
+      <div>
         <Label htmlFor="content">Conteúdo do Post</Label>
-        <RichTextEditor value={content} onChange={setContent} />
+        <RichTextEditor
+          value={watchedContent}
+          onChange={(value) => setValue("content", value, { shouldValidate: true })}
+        />
+        {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>}
       </div>
-
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...
-          </>
-        ) : (
-          <>
-            <Save className="mr-2 h-4 w-4" /> Salvar Post
-          </>
-        )}
+      <Button type="submit" disabled={isPending}>
+        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {initialData?.id ? "Atualizar Post" : "Criar Post"}
       </Button>
     </form>
   )

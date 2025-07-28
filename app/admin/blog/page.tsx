@@ -36,9 +36,16 @@ export default function BlogManagementPage() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch("/api/admin/blog")
+      // Usando NEXT_PUBLIC_APP_URL para garantir que a chamada funcione em produção
+      // Adicionado `credentials: 'include'` para garantir que os cookies de autenticação sejam enviados
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog`, {
+        credentials: "include",
+      })
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // Tenta ler a resposta como texto para depuração se não for JSON
+        const errorText = await response.text()
+        console.error("API Error Response:", errorText)
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText.substring(0, 200)}...`) // Aumentado para 200 caracteres
       }
       const data = await response.json()
       setPosts(data)
@@ -46,7 +53,7 @@ export default function BlogManagementPage() {
       setError(`Failed to fetch posts: ${e.message}`)
       toast({
         title: "Erro ao carregar posts",
-        description: "Não foi possível carregar os posts do blog. Tente novamente.",
+        description: `Não foi possível carregar os posts do blog. Detalhes: ${e.message}. Tente novamente.`,
         variant: "destructive",
       })
     } finally {
@@ -62,8 +69,9 @@ export default function BlogManagementPage() {
     if (!postToDelete) return
 
     try {
-      const response = await fetch(`/api/admin/blog/${postToDelete}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/blog/${postToDelete}`, {
         method: "DELETE",
+        credentials: "include", // Adicionado para garantir que os cookies sejam enviados
       })
 
       if (!response.ok) {

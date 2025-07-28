@@ -1,10 +1,12 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import Script from "next/script"
 import "./globals.css"
-import { ClientComponents } from "./client-components"
+import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/contexts/auth-context" // Import AuthProvider
+import Script from "next/script"
 import { Toaster } from "@/components/ui/toaster" // Ensure Toaster is imported
+import { ClientComponents } from "./client-components" // Import ClientComponents
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -18,7 +20,6 @@ export const metadata: Metadata = {
   creator: "Nicholas Advocacia",
   publisher: "Nicholas Advocacia",
   robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1",
   openGraph: {
     type: "website",
     locale: "pt_BR",
@@ -37,17 +38,21 @@ export const metadata: Metadata = {
     generator: 'v0.dev'
 }
 
+// New viewport export for Next.js 14.2.16 warnings
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#1e2c49",
+}
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#1e2c49" />
-        <link rel="canonical" href="https://www.nicholasadvocacia.com.br" />
-
         {/* Google Tag Manager */}
         <Script
           id="gtm-script"
@@ -57,7 +62,7 @@ export default function RootLayout({
               (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
               new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
               j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;
+              'https://www.googletagmanager.com/gtm.js?id=GTM-PZ96Q3PZ';
               if(f && f.parentNode) {
                 f.parentNode.insertBefore(j,f);
               } else {
@@ -115,8 +120,12 @@ export default function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
-        <ClientComponents>{children}</ClientComponents>
-        <Toaster /> {/* Ensure Toaster is rendered */}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <AuthProvider>
+            <ClientComponents>{children}</ClientComponents>
+          </AuthProvider>
+        </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   )

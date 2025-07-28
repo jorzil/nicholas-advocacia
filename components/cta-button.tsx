@@ -1,47 +1,26 @@
 "use client"
+
 import Link from "next/link"
-import NextImage from "next/image"
-import { Button } from "@/components/ui/button"
 import { Phone } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
-interface CTAButtonProps {
-  text: string
-  href: string
-  whatsapp?: boolean
-}
-
-export function CTAButton({ text, href, whatsapp = false }: CTAButtonProps) {
+/**
+ * Pequeno botão CTA reutilizado no rodapé
+ * e no final dos posts do blog.
+ */
+export function CtaButton() {
   return (
-    <Link
-      href={href}
-      className="inline-flex items-center justify-center gap-2 rounded-md bg-[#d4b26a] px-6 py-3 font-medium text-[#1e2c49] transition-colors hover:bg-[#c4a25a]"
-    >
-      {text}
-      {whatsapp && <NextImage src="/whatsapp-icon.png" alt="WhatsApp" width={20} height={20} />}
-    </Link>
-  )
-}
-
-// Named export for compatibility
-export { CTAButton as CtaButton }
-
-// WhatsApp CTA Button
-interface WhatsAppCTAProps {
-  message?: string
-  className?: string
-}
-
-export function WhatsAppCTA({ message = "Olá! Gostaria de uma consulta jurídica.", className = "" }: WhatsAppCTAProps) {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5533999999999"
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
-
-  return (
-    <Link href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-      <Button className={`bg-green-600 hover:bg-green-700 text-white ${className}`}>
-        <NextImage src="/whatsapp-icon.png" alt="WhatsApp" width={20} height={20} className="mr-2" />
+    <Button asChild size="lg" className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] px-8 py-4 text-lg">
+      <Link
+        href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site!"
+        className="flex items-center gap-2"
+      >
+        <Phone className="h-5 w-5" />
         Falar no WhatsApp
-        <Phone className="ml-2 h-4 w-4" />
-      </Button>
-    </Link>
+      </Link>
+    </Button>
   )
 }
+
+/* allow `import CtaButton from '@/components/cta-button'` as well */
+export default CtaButton

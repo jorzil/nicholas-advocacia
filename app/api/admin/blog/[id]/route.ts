@@ -259,7 +259,6 @@ let blogPosts = [
 ]
 
 export async function GET(request: Request) {
-  // In a real app, you'd likely filter based on query params (e.g., status=published)
   return NextResponse.json(blogPosts)
 }
 

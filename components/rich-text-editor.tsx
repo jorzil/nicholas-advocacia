@@ -15,36 +15,27 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
 
   const modules = {
     toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      ["bold", "italic", "underline", "strike"], // toggled buttons
-      ["blockquote", "code-block"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-      [{ direction: "rtl" }], // text direction
-      [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-      [{ font: [] }],
-      [{ align: [] }],
+      [{ header: "1" }, { header: "2" }, { font: [] }],
+      [{ size: [] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
       ["link", "image", "video"],
-      ["clean"], // remove formatting button
+      ["clean"],
     ],
   }
 
   const formats = [
     "header",
+    "font",
+    "size",
     "bold",
     "italic",
     "underline",
     "strike",
     "blockquote",
-    "code-block",
     "list",
     "bullet",
     "indent",
-    "direction",
-    "color",
-    "background",
-    "font",
-    "align",
     "link",
     "image",
     "video",
@@ -58,7 +49,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
         onChange={onChange}
         modules={modules}
         formats={formats}
-        className="h-[250px]" // Adjust height as needed
+        className="h-[250px]"
       />
     </div>
   )

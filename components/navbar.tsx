@@ -6,12 +6,14 @@ import Image from "next/image"
 import { Menu, X, Phone } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/hooks/use-auth" // Import useAuth
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
+  const { user, isLoading, logout } = useAuth() // Safely destructure user, isLoading, and logout
 
   useEffect(() => {
     setIsMounted(true)
@@ -141,6 +143,27 @@ export function Navbar() {
             >
               Contato
             </button>
+            {isLoading ? null : user ? (
+              <>
+                <span className="text-gray-700">Olá, {user.username}!</span>
+                <Button
+                  onClick={logout}
+                  variant="outline"
+                  className="text-gray-700 border-gray-700 hover:bg-[#d4b26a] hover:text-white bg-transparent"
+                >
+                  Sair
+                </Button>
+                <Link href="/admin/blog">
+                  <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
+                    Admin
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <Link href="/admin/login">
+                
+              </Link>
+            )}
             <Button className="bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
               <Link
                 href="https://wa.me/5533933009228?text=Olá,%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20informações%20sobre%20serviços%20jurídicos!"
@@ -215,6 +238,40 @@ export function Navbar() {
               >
                 Contato
               </button>
+              <div className="px-3 py-2">
+                {isLoading ? null : user ? (
+                  <>
+                    <span className="text-sm text-gray-700 block mb-2">Olá, {user.username}!</span>
+                    <Button
+                      onClick={() => {
+                        logout()
+                        setIsOpen(false)
+                      }}
+                      variant="outline"
+                      className="w-full text-gray-700 border-gray-700 hover:bg-[#d4b26a] hover:text-white bg-transparent mb-2"
+                    >
+                      Sair
+                    </Button>
+                    <Link href="/admin/blog">
+                      <Button
+                        className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Admin
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <Link href="/admin/login">
+                    <Button
+                      className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Login Admin
+                    </Button>
+                  </Link>
+                )}
+              </div>
               <div className="px-3 py-2">
                 <Button className="w-full bg-[#d4b26a] text-[#1e2c49] hover:bg-[#c4a25a] focus:ring-2 focus:ring-[#d4b26a]">
                   <Link

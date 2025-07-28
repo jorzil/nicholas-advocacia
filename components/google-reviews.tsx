@@ -171,14 +171,7 @@ export function GoogleReviews() {
 
         {reviewsData.place_id && (
           <div className="text-center mt-8">
-            <Button
-              variant="outline"
-              className="border-[#1e2c49] text-[#1e2c49] hover:bg-[#1e2c49] hover:text-white bg-transparent"
-              onClick={() => window.open(`https://www.google.com/maps?cid=${reviewsData.place_id}`, "_blank")}
-            >
-              Ver Todas as Avaliações no Google
-              <ExternalLink className="h-4 w-4 ml-2" />
-            </Button>
+            
           </div>
         )}
       </div>

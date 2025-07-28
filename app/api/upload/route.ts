@@ -1,21 +1,26 @@
-import { NextResponse } from "next/server"
 import { put } from "@vercel/blob"
-import { customAlphabet } from "nanoid"
-
-const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 7) // 7-character random string
+import { NextResponse } from "next/server"
 
 export async function POST(request: Request): Promise<NextResponse> {
   const { searchParams } = new URL(request.url)
   const filename = searchParams.get("filename")
-  const folder = searchParams.get("folder") || "uploads" // Default to 'uploads' folder
 
-  if (!request.body) {
-    return NextResponse.json({ message: "No file provided" }, { status: 400 })
+  if (!filename) {
+    return NextResponse.json({ message: "Filename is required" }, { status: 400 })
   }
 
-  const blob = await put(`${folder}/${nanoid()}-${filename}`, request.body, {
-    access: "public",
-  })
+  if (!request.body) {
+    return NextResponse.json({ message: "Request body is empty" }, { status: 400 })
+  }
 
-  return NextResponse.json(blob)
+  try {
+    const blob = await put(filename, request.body, {
+      access: "public",
+    })
+
+    return NextResponse.json(blob)
+  } catch (error) {
+    console.error("Error uploading blob:", error)
+    return NextResponse.json({ message: "Failed to upload file", error: (error as Error).message }, { status: 500 })
+  }
 }

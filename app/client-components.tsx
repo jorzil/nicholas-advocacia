@@ -3,8 +3,8 @@
 import type React from "react"
 import { useEffect } from "react"
 import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer" // Assuming Footer is a global component
+import { WhatsAppButton } from "@/components/whatsapp-button" // Assuming WhatsAppButton is a global component
 
 export function ClientComponents({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -94,8 +94,6 @@ export function ClientComponents({ children }: { children: React.ReactNode }) {
       <main role="main">{children}</main>
       <Footer />
       <WhatsAppButton />
-      {/* If GoogleReviews is meant to be a global client component, it could be here.
-          However, it's currently used directly in app/page.tsx, which is fine. */}
     </>
   )
 }

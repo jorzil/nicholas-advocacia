@@ -383,7 +383,7 @@ export default function BlogPage() {
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <BlogSidebar />
+              <BlogSidebar posts={mockBlogPosts.filter((post) => post.status === "published")} />
             </div>
           </div>
         </div>
