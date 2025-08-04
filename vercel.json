@@ -1,3 +1,4 @@
 {
+  // Desativa o frozen-lockfile só na pipeline do Vercel
   "installCommand": "pnpm install --no-frozen-lockfile"
 }

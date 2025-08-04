@@ -190,7 +190,7 @@ const blogPosts = [
       <h2>Etapas Essenciais da Incorporação</h2>
       <ol>
         <li><strong>Aquisição do Terreno:</strong> A primeira etapa é a compra do terreno, que deve ser feita com uma análise jurídica prévia (due diligence) para verificar a regularidade da propriedade e a inexistência de ônus.</li>
-        <li><strong>Estudo de Viabilidade:</strong> Análise técnica, econômica e jurídica para determinar a viabilidade do empreendimento, considerando zoneamento, zoneamento, licenças, custos e potencial de vendas.</li>
+        <li><strong>Estudo de Viabilidade:</strong> Análise técnica, econômica e jurídica para determinar a viabilidade do empreendimento, considerando zoneamento, licenças, custos e potencial de vendas.</li>
         <li><strong>Projeto e Aprovações:</strong> Elaboração do projeto arquitetônico e de engenharia, e obtenção das aprovações necessárias junto à prefeitura e outros órgãos.</li>
         <li><strong>Registro da Incorporação:</strong> Etapa crucial onde todos os documentos do empreendimento (projeto, memorial descritivo, convenção de condomínio, etc.) são registrados no Cartório de Registro de Imóveis. Este registro é indispensável para a venda das unidades na planta.</li>
         <li><strong>Comercialização:</strong> Venda das unidades, geralmente por meio de contratos de promessa de compra e venda.</li>
